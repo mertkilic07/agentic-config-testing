@@ -95,6 +95,7 @@ How each step works: [docs/method.md](docs/method.md).
 | [Progress report](docs/progress.md) | The project story so far, results and problems |
 | [Method](docs/method.md) | How the pipeline works, known open issues |
 | [Candidate systems](docs/candidates.md) | SQLite, BusyBox and ZooKeeper compared |
+| [System selection](docs/selection.md) | Why SQLite, and why not BusyBox or ZooKeeper (with sources) |
 | [Glossary](docs/glossary.md) | Terms used in this project |
 | [Team tasks](docs/team-tasks.md) | Who works on what |
 
