@@ -55,6 +55,7 @@ def main():
     g = ap.add_mutually_exclusive_group(required=True)
     g.add_argument("--row", type=int, help="1-based ACTS row number")
     g.add_argument("--all", action="store_true")
+    g.add_argument("--default", action="store_true", help="baseline: every option off (not an ACTS row)")
     ap.add_argument("--allow-root", action="store_true", help="SQLite permission tests fail as root")
     a = ap.parse_args()
 
@@ -66,6 +67,9 @@ def main():
     unknown = [h for h in header if h not in mapping["options"]]
     if unknown:
         sys.exit(f"error: no build mapping for {unknown}")
+    if a.default:
+        run_one(a, mapping, header, ["off"] * len(header), 0)
+        return
     todo = range(1, len(rows) + 1) if a.all else [a.row]
     for n in todo:
         run_one(a, mapping, header, rows[n - 1], n)
@@ -73,7 +77,7 @@ def main():
 
 def run_one(a, mapping, header, row, n):
     cfg = dict(zip(header, row))
-    name = f"acts-{n:02d}"
+    name = "default" if n == 0 else f"acts-{n:02d}"
     res = os.path.join(a.results, f"{name}-{a.scope}")
     shutil.rmtree(res, ignore_errors=True); os.makedirs(res)
     build = os.path.join(a.work, "builds", name)
