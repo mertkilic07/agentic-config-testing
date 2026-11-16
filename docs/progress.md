@@ -60,8 +60,11 @@ Problems found and how they were handled:
 | gcovr 8.3 failed on the quick run with negative and very large counters | Non-atomic counters with threads (negatives); genuinely huge loop counts (suspicious) | `-fprofile-update=atomic` (fixed negatives) + raised suspicious-hits threshold |
 
 The 4 quick-suite errors (`recoverfault-1/2-oom-*`, in `ext/recover/recoverfault.test`)
-are deliberate allocation-failure tests. Their cause is **not established**; they are recorded
-as baseline failures, not as interaction bugs.
+are deliberate allocation-failure tests. They are recorded as baseline failures, not as
+interaction bugs. Cause (task F, checked on x86_64): a test-order dependency in SQLite's own
+suite. `recovercorrupt4.test` leaves a corrupt `testdir/test.db2`, which `recoverfault.test`
+then uses as its output file; deleting that file in between gives 0 errors. Details:
+[results/investigations/recoverfault](../results/investigations/recoverfault/README.md).
 
 ## 4. Pilot model and ACTS covering array
 

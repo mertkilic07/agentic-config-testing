@@ -1,0 +1,118 @@
+# Summary lines extracted from each test log (full logs kept locally, not committed).
+# Machine: Windows 11, Docker Desktop, image ens491-sqlite, Linux x86_64. SQLite 3.46.1.
+
+## a_nocov
+0 errors out of 7495 tests on 7362912ef5d4 Linux 64-bit little-endian
+
+## b_cov
+0 errors out of 7495 tests on 7362912ef5d4 Linux 64-bit little-endian
+
+## c_quick_only
+0 errors out of 7498 tests on cc911dfe8323 Linux 64-bit little-endian
+
+## d_prefix_all
+4 errors out of 32187 tests on 991113b9962c Linux 64-bit little-endian
+! recoverfault-1-oom-persistent.435 expected: [0 ok]
+! recoverfault-1-oom-persistent.435 got:      [1 {nfail=0 rc=1 result= list={0 {}} {1 {}} {1 {out of memory}}}]
+! recoverfault-1-oom-transient.435 expected: [0 ok]
+! recoverfault-1-oom-transient.435 got:      [1 {nfail=0 rc=1 result= list={0 {}} {1 {}} {1 {out of memory}}}]
+! recoverfault-2-oom-persistent.436 expected: [0 ok]
+! recoverfault-2-oom-persistent.436 got:      [1 {nfail=0 rc=1 result= list={0 {}} {1 {}} {1 {out of memory}}}]
+! recoverfault-2-oom-transient.436 expected: [0 ok]
+! recoverfault-2-oom-transient.436 got:      [1 {nfail=0 rc=1 result= list={0 {}} {1 {}} {1 {out of memory}}}]
+
+## e_expert
+0 errors out of 7561 tests on 4cf7b637b7f7 Linux 64-bit little-endian
+
+## e_fts5
+0 errors out of 7750 tests on 4cf7b637b7f7 Linux 64-bit little-endian
+
+## e_intck
+0 errors out of 37386 tests on 4cf7b637b7f7 Linux 64-bit little-endian
+
+## e_lsm1
+0 errors out of 7499 tests on 4cf7b637b7f7 Linux 64-bit little-endian
+
+## e_rbu
+0 errors out of 7581 tests on 4cf7b637b7f7 Linux 64-bit little-endian
+
+## e_recover
+4 errors out of 1900 tests on 4cf7b637b7f7 Linux 64-bit little-endian
+! recoverfault-1-oom-persistent.435 expected: [0 ok]
+! recoverfault-1-oom-persistent.435 got:      [1 {nfail=0 rc=1 result= list={0 {}} {1 {}} {1 {out of memory}}}]
+! recoverfault-1-oom-transient.435 expected: [0 ok]
+! recoverfault-1-oom-transient.435 got:      [1 {nfail=0 rc=1 result= list={0 {}} {1 {}} {1 {out of memory}}}]
+! recoverfault-2-oom-persistent.436 expected: [0 ok]
+! recoverfault-2-oom-persistent.436 got:      [1 {nfail=0 rc=1 result= list={0 {}} {1 {}} {1 {out of memory}}}]
+! recoverfault-2-oom-transient.436 expected: [0 ok]
+! recoverfault-2-oom-transient.436 got:      [1 {nfail=0 rc=1 result= list={0 {}} {1 {}} {1 {out of memory}}}]
+
+## f_recover1
+0 errors out of 7635 tests on fbfc60d1279f Linux 64-bit little-endian
+
+## f_recoverbuild
+0 errors out of 7539 tests on fbfc60d1279f Linux 64-bit little-endian
+
+## f_recoverclobber
+0 errors out of 7540 tests on fbfc60d1279f Linux 64-bit little-endian
+
+## f_recovercorrupt2
+0 errors out of 7620 tests on fbfc60d1279f Linux 64-bit little-endian
+
+## f_recovercorrupt3
+0 errors out of 7542 tests on fbfc60d1279f Linux 64-bit little-endian
+
+## f_recovercorrupt4
+4 errors out of 1753 tests on fbfc60d1279f Linux 64-bit little-endian
+! recoverfault-1-oom-persistent.435 expected: [0 ok]
+! recoverfault-1-oom-persistent.435 got:      [1 {nfail=0 rc=1 result= list={0 {}} {1 {}} {1 {out of memory}}}]
+! recoverfault-1-oom-transient.435 expected: [0 ok]
+! recoverfault-1-oom-transient.435 got:      [1 {nfail=0 rc=1 result= list={0 {}} {1 {}} {1 {out of memory}}}]
+! recoverfault-2-oom-persistent.436 expected: [0 ok]
+! recoverfault-2-oom-persistent.436 got:      [1 {nfail=0 rc=1 result= list={0 {}} {1 {}} {1 {out of memory}}}]
+! recoverfault-2-oom-transient.436 expected: [0 ok]
+! recoverfault-2-oom-transient.436 got:      [1 {nfail=0 rc=1 result= list={0 {}} {1 {}} {1 {out of memory}}}]
+
+## g_a_nocov_keep
+4 errors out of 1745 tests on 7027fb5e09d7 Linux 64-bit little-endian
+! recoverfault-1-oom-persistent.435 expected: [0 ok]
+! recoverfault-1-oom-persistent.435 got:      [1 {nfail=0 rc=1 result= list={0 {}} {1 {}} {1 {out of memory}}}]
+! recoverfault-1-oom-transient.435 expected: [0 ok]
+! recoverfault-1-oom-transient.435 got:      [1 {nfail=0 rc=1 result= list={0 {}} {1 {}} {1 {out of memory}}}]
+! recoverfault-2-oom-persistent.436 expected: [0 ok]
+! recoverfault-2-oom-persistent.436 got:      [1 {nfail=0 rc=1 result= list={0 {}} {1 {}} {1 {out of memory}}}]
+! recoverfault-2-oom-transient.436 expected: [0 ok]
+! recoverfault-2-oom-transient.436 got:      [1 {nfail=0 rc=1 result= list={0 {}} {1 {}} {1 {out of memory}}}]
+
+## g_a_nocov_delete
+0 errors out of 7495 tests on 7027fb5e09d7 Linux 64-bit little-endian
+
+## g_b_cov_keep
+4 errors out of 1745 tests on 7027fb5e09d7 Linux 64-bit little-endian
+! recoverfault-1-oom-persistent.435 expected: [0 ok]
+! recoverfault-1-oom-persistent.435 got:      [1 {nfail=0 rc=1 result= list={0 {}} {1 {}} {1 {out of memory}}}]
+! recoverfault-1-oom-transient.435 expected: [0 ok]
+! recoverfault-1-oom-transient.435 got:      [1 {nfail=0 rc=1 result= list={0 {}} {1 {}} {1 {out of memory}}}]
+! recoverfault-2-oom-persistent.436 expected: [0 ok]
+! recoverfault-2-oom-persistent.436 got:      [1 {nfail=0 rc=1 result= list={0 {}} {1 {}} {1 {out of memory}}}]
+! recoverfault-2-oom-transient.436 expected: [0 ok]
+! recoverfault-2-oom-transient.436 got:      [1 {nfail=0 rc=1 result= list={0 {}} {1 {}} {1 {out of memory}}}]
+
+## g_b_cov_delete
+0 errors out of 7495 tests on 7027fb5e09d7 Linux 64-bit little-endian
+
+## h_acts03cov_keep
+4 errors out of 2101 tests on 47f16ad328ec Linux 64-bit little-endian
+! recoverfault-1-oom-persistent.524 expected: [0 ok]
+! recoverfault-1-oom-persistent.524 got:      [1 {nfail=0 rc=1 result= list={0 {}} {1 {}} {1 {out of memory}}}]
+! recoverfault-1-oom-transient.524 expected: [0 ok]
+! recoverfault-1-oom-transient.524 got:      [1 {nfail=0 rc=1 result= list={0 {}} {1 {}} {1 {out of memory}}}]
+! recoverfault-2-oom-persistent.525 expected: [0 ok]
+! recoverfault-2-oom-persistent.525 got:      [1 {nfail=0 rc=1 result= list={0 {}} {1 {}} {1 {out of memory}}}]
+! recoverfault-2-oom-transient.525 expected: [0 ok]
+! recoverfault-2-oom-transient.525 got:      [1 {nfail=0 rc=1 result= list={0 {}} {1 {}} {1 {out of memory}}}]
+
+## single recovery into leftover test.db2 (run5.sh)
+== single recovery into leftover test.db2 (3072 bytes):
+run: rc=0 result=11 errcode=11 errmsg=
+finish: rc=1 result=
