@@ -102,14 +102,24 @@ line counts.
 
 The quick-suite run of the same row is in progress.
 
-## 6. Growing the model (in progress)
+## 6. Option screening: two silent constraints
 
-Each candidate option is first built alone and checked (`scripts/screen_options.py`,
-candidates in `models/sqlite-candidates.json`): does it build, is it reported by
-`PRAGMA compile_options`, does a small functional probe work, does `main.test` pass?
-Pairs that may hide a constraint are checked too (for example `ENABLE_GEOPOLY` without
-`ENABLE_RTREE`, because the geopoly code sits inside the R-tree source behind `#ifdef`).
-Results will be in `results/screening/`.
+Before an option may enter the model, it is built alone and checked
+(`scripts/screen_options.py`, candidates in `models/sqlite-candidates.json`, full table in
+[results/screening/screening.md](../results/screening/screening.md)): does it build, is it
+reported by `PRAGMA compile_options`, does a small functional probe work, does `main.test` pass?
+
+All 16 candidates built and passed `main.test` alone. Two pair checks revealed **silent**
+behaviour, where the build or the pragma succeeds but the requested feature is missing:
+
+| Combination | What happens | Why (source) |
+|---|---|---|
+| `ENABLE_GEOPOLY` without `ENABLE_RTREE` | Build succeeds and `compile_options` reports `ENABLE_GEOPOLY`, but `geopoly_area()` does not exist | geopoly is compiled from inside `ext/rtree/rtree.c`, behind `#ifdef SQLITE_ENABLE_GEOPOLY` |
+| `OMIT_WAL` (compile-time) + `PRAGMA journal_mode=WAL` (runtime) | No error; the pragma returns `delete` and WAL is not used | WAL code removed at compile time; the pragma keeps the old mode |
+
+The second one crosses the compile-time / runtime boundary. Both are candidates for the
+constraint list of the model and for the later test-gap analysis. These checks ran on a
+Linux x86_64 VM.
 
 ## 7. What is not done yet
 
