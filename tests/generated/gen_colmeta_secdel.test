@@ -1,0 +1,27 @@
+# Generated test (LLM): pair SQLITE_ENABLE_COLUMN_METADATA x SQLITE_SECURE_DELETE.
+# Gap: no existing quick-suite file guards on both. No shared code path is expected:
+# the test checks that column origins are unaffected by secure_delete (independence check).
+source [file join [file dirname [info script]] common.tcl]
+set testprefix gen_colmeta_secdel
+ifcapable !columnmetadata { finish_test ; return }
+
+foreach {tn sd} {1 0 2 1} {
+  reset_db
+  do_execsql_test $tn.0 "
+    PRAGMA secure_delete = $sd;
+    CREATE TABLE t1(a INTEGER PRIMARY KEY, b TEXT);
+    CREATE TABLE t2(x PRIMARY KEY, y) WITHOUT ROWID;
+  " $sd
+  do_execsql_test $tn.1 {
+    INSERT INTO t1 VALUES(1, 'a'), (2, 'b'); DELETE FROM t1 WHERE a=1;
+    INSERT INTO t2 VALUES(1, 'p'); DELETE FROM t2;
+  }
+  do_test $tn.2 {
+    set stmt [sqlite3_prepare_v2 db {SELECT b, a, y FROM t1, t2} -1 dummy]
+    set r [list]
+    foreach i {0 1 2} { lappend r [sqlite3_column_table_name $stmt $i] }
+    sqlite3_finalize $stmt
+    set r
+  } {t1 t1 t2}
+}
+finish_test

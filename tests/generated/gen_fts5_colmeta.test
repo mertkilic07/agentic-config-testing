@@ -1,0 +1,42 @@
+# Generated test (LLM): pair SQLITE_ENABLE_FTS5 x SQLITE_ENABLE_COLUMN_METADATA.
+# Gap: no existing quick-suite file guards on both fts5 and columnmetadata.
+# Oracle: documentation of sqlite3_column_table_name()/origin_name() ("If the Nth column
+# returned by the statement is an expression ... these routines return NULL") and of
+# sqlite3_table_column_metadata(). Expected values for virtual-table columns that the
+# documentation does not fix are marked CHARACTERIZATION (observed behaviour).
+source [file join [file dirname [info script]] common.tcl]
+set testprefix gen_fts5_colmeta
+ifcapable !fts5 { finish_test ; return }
+
+proc origins {sql} {
+  set stmt [sqlite3_prepare_v2 db $sql -1 dummy]
+  set res [list]
+  for {set i 0} {$i < [sqlite3_column_count $stmt]} {incr i} {
+    lappend res [sqlite3_column_table_name $stmt $i] [sqlite3_column_origin_name $stmt $i]
+  }
+  sqlite3_finalize $stmt
+  set res
+}
+
+do_execsql_test 1.0 {
+  CREATE VIRTUAL TABLE ft USING fts5(a, b);
+  INSERT INTO ft VALUES('hello world', 'second column');
+}
+
+ifcapable columnmetadata {
+  # Columns of an FTS5 table have their table as origin.
+  do_test 1.1 { origins {SELECT a, b FROM ft} } {ft a ft b}
+  # Auxiliary-function results are expressions: no origin.
+  do_test 1.2 { origins {SELECT highlight(ft, 0, '[', ']') FROM ft WHERE ft MATCH 'hello'} } {{} {}}
+  # Hidden columns rank and the table-name column. CHARACTERIZATION.
+  do_test 1.3 { origins {SELECT rank, ft FROM ft WHERE ft MATCH 'hello'} } {ft rank ft ft}
+  # Shadow tables are ordinary tables.
+  do_test 1.4 { origins {SELECT id, block FROM ft_data} } {ft_data id ft_data block}
+}
+
+# sqlite3_table_column_metadata is always available.
+do_test 2.1 { sqlite3_table_column_metadata db main ft a } {{} BINARY 0 0 0}
+do_test 2.2 { sqlite3_table_column_metadata db main ft_data id } {INTEGER BINARY 0 1 0}
+do_test 2.3 { catch {sqlite3_table_column_metadata db main ft nosuchcol} } 1
+
+finish_test

@@ -1,0 +1,66 @@
+# Generated test (LLM): pair SQLITE_ENABLE_FTS5 x SQLITE_SECURE_DELETE.
+# Gap: no existing quick-suite file guards on both fts5 and secure_delete.
+# Oracle: SQLite documentation of PRAGMA secure_delete ("the default setting is determined
+# by the SQLITE_SECURE_DELETE compile-time option"; "SQLite overwrites deleted content with
+# zeros") and of the FTS5 'optimize' and 'secure-delete' commands.
+source [file join [file dirname [info script]] common.tcl]
+set testprefix gen_fts5_secdel
+ifcapable !fts5 { finish_test ; return }
+
+# 1. The compile-time option sets the default of PRAGMA secure_delete.
+ifcapable secure_delete  { do_execsql_test 1.0 { PRAGMA secure_delete } 1 }
+ifcapable !secure_delete { do_execsql_test 1.0 { PRAGMA secure_delete } 0 }
+
+# 2. A deleted FTS5 document and its index entries must not remain in the database file
+#    when secure_delete is in effect (default from the compile-time option).
+reset_db
+do_execsql_test 2.0 {
+  PRAGMA journal_mode = DELETE;
+  CREATE VIRTUAL TABLE ft USING fts5(x);
+  WITH s(i) AS (SELECT 1 UNION ALL SELECT i+1 FROM s WHERE i<300)
+    INSERT INTO ft SELECT 'filler document number ' || i FROM s;
+  INSERT INTO ft VALUES('alpha zqxjkvmarker beta');
+} {delete}
+do_execsql_test 2.1 {
+  DELETE FROM ft WHERE ft MATCH 'zqxjkvmarker';
+  INSERT INTO ft(ft) VALUES('optimize');
+  SELECT count(*) FROM ft WHERE ft MATCH 'zqxjkvmarker';
+} {0}
+do_execsql_test 2.2 { INSERT INTO ft(ft) VALUES('integrity-check'); PRAGMA integrity_check } {ok}
+ifcapable secure_delete {
+  do_test 2.3 { db close ; gen_file_contains test.db zqxjkvmarker } 0
+  sqlite3 db test.db
+}
+
+# 3. Runtime PRAGMA secure_delete=ON must give the same guarantee as the compile-time option.
+reset_db
+do_execsql_test 3.0 {
+  PRAGMA journal_mode = DELETE;
+  PRAGMA secure_delete = ON;
+  CREATE VIRTUAL TABLE ft USING fts5(x);
+  WITH s(i) AS (SELECT 1 UNION ALL SELECT i+1 FROM s WHERE i<300)
+    INSERT INTO ft SELECT 'filler document number ' || i FROM s;
+  INSERT INTO ft VALUES('alpha qwmarkerpz beta');
+  DELETE FROM ft WHERE ft MATCH 'qwmarkerpz';
+  INSERT INTO ft(ft) VALUES('optimize');
+} {delete 1}
+do_test 3.1 { db close ; gen_file_contains test.db qwmarkerpz } 0
+sqlite3 db test.db
+
+# 4. FTS5's own 'secure-delete' option removes index entries immediately (no optimize),
+#    independently of the page-level PRAGMA secure_delete.
+foreach {tn sd} {1 0 2 1} {
+  reset_db
+  do_execsql_test 4.$tn.0 "
+    PRAGMA secure_delete = $sd;
+    CREATE VIRTUAL TABLE ft USING fts5(x);
+    CREATE VIRTUAL TABLE v USING fts5vocab(ft, 'row');
+    INSERT INTO ft(ft, rank) VALUES('secure-delete', 1);
+    INSERT INTO ft VALUES('one two three'), ('two three four');
+    DELETE FROM ft WHERE rowid=1;
+    SELECT term FROM v ORDER BY term;
+  " [list $sd four three two]
+  do_execsql_test 4.$tn.1 { INSERT INTO ft(ft) VALUES('integrity-check') } {}
+}
+
+finish_test
