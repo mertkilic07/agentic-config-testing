@@ -75,8 +75,8 @@ list (a quoting fix; the run's output is in `runs.txt`).
   on branch `task-e-ifcapable-map`); `ext/recover/recover_common.tcl` only skips them if the Tcl
   command `sqlite3_recover_init` is missing, which does not depend on the pilot options. So they
   run in every configuration of the pilot model.
-  Prediction, **not verified** until Mert's table is in: all 6 rows show them, with N that may
-  differ per row.
+  Prediction, **confirmed** by the full table of 16 Nov: all 6 rows and the default build show
+  them, with N between 435 and 563.
 - They should be reported in the table as a known baseline/test-isolation failure, **kept** in
   the error counts (team rule: do not re-run until they disappear), with a note pointing here.
 - They are not evidence of an option interaction.

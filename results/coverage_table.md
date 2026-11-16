@@ -14,9 +14,9 @@
 
 | Failing tests | Rows where they fail | Explanation |
 |---|---|---|
-| `recoverfault-1/2-oom-*` (4) | all 7, including default | Baseline failure, cause not established |
+| `recoverfault-1/2-oom-*` (4) | all 7, including default | Test-order dependency in SQLite's suite: `recovercorrupt4.test` leaves a corrupt `test.db2` that `recoverfault.test` reuses ([investigation](investigations/recoverfault/README.md)) |
 | `zipfile-6.0` (1) | all 7, including default | Timestamps differ by exactly 3600 s; likely time zone, **not verified** |
-| `fts5corrupt3-74.1`, `-75.1` (2) | exactly the rows with `FTS5=on` (03, 04, 05) | Guarded only by `ifcapable fts5`, but expects the FTS3/4 `matchinfo()` error message. With FTS5 on and FTS3 off: `no such function: matchinfo` |
+| `fts5corrupt3-74.1`, `-75.1` (2) | exactly the rows with `FTS5=on` (03, 04, 05) | Guarded only by `ifcapable fts5`, but expects the FTS3 `matchinfo()` error message. With FTS5 on and FTS3 off: `no such function: matchinfo` (**verified**: adding FTS3 removes the errors, [details](../tests/existing/fts5corrupt3-matchinfo.md)) |
 | `values-11.0`, `-11.1` (2) | exactly the rows with `FTS5=on` (03, 04, 05) | `test/values.test` line 383: block guarded by `ifcapable fts5` creates a table `USING fts3`. With FTS5 on and FTS3 off: `no such module: fts3` (**verified in the test source**) |
 
 The last two rows are configuration-dependent failures of SQLite's own test suite: the tests

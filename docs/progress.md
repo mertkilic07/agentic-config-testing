@@ -114,7 +114,7 @@ FTS3 is compiled in (`ext/fts3/fts3.c:4174`), but the file is guarded only on FT
 only that file on fast builds (no coverage, x86_64): FTS5 + SECURE_DELETE → these 2 errors
 (`no such function: matchinfo`); adding FTS3 → 0 errors. This is an FTS5 × FTS3 interaction
 in the test suite, not shown to be a library defect. Since FTS3 is off in every row, rows 3–5
-(FTS5 on) are expected to show it (not verified until the full table is in). Details:
+(FTS5 on) were expected to show it; the full table confirms this (section 5b). Details:
 [tests/existing/fts5corrupt3-matchinfo.md](../tests/existing/fts5corrupt3-matchinfo.md).
 
 Coverage fix: with `-fprofile-update=atomic` there are no more negative counters. gcovr still

@@ -69,7 +69,7 @@ The builds had no coverage flags, unlike `run_config.py`.
   An `ifcapable fts3` guard on these two tests (or expecting either message) would remove them.
 - In both builds SQLite returns an error for this query; only the message differs. This is
   **not** shown to be a defect in the library itself.
-- Prediction for the pilot table (not verified until Mert's results are in): FTS3 is off in every
+- Prediction for the pilot table, **confirmed** by the full table of 16 Nov (`results/coverage_table.md`): FTS3 is off in every
   row, so every row with FTS5 on (rows 3, 4, 5 of `configs/sqlite-pairwise.csv`) should show these
   two errors, and rows 1, 2, 6 should not (the file is skipped).
 - Whether later SQLite versions changed these tests: **not verified**.
