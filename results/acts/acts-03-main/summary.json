@@ -1,0 +1,64 @@
+{
+  "configuration": "acts-03",
+  "acts_row": 3,
+  "values": {
+    "SQLITE_ENABLE_FTS5": "on",
+    "SQLITE_ENABLE_RTREE": "off",
+    "SQLITE_ENABLE_COLUMN_METADATA": "off",
+    "SQLITE_SECURE_DELETE": "on"
+  },
+  "scope": "test/main.test",
+  "sqlite_source": "/tmp/claude-0/-home-claude/38f4f9b6-3d0e-5409-817a-917569cefa08/scratchpad/s346",
+  "started": "2026-11-16T19:57:01",
+  "machine": "Linux x86_64",
+  "user": "tester",
+  "build": {
+    "opts": "-DSQLITE_ENABLE_FTS5 -DSQLITE_SECURE_DELETE",
+    "cflags": "-O0 -g --coverage -fprofile-update=atomic",
+    "exit_code": 0,
+    "seconds": 24,
+    "status": "ok"
+  },
+  "effective_options": {
+    "SQLITE_ENABLE_FTS5": {
+      "requested": "on",
+      "present": true
+    },
+    "SQLITE_ENABLE_RTREE": {
+      "requested": "off",
+      "present": false
+    },
+    "SQLITE_ENABLE_COLUMN_METADATA": {
+      "requested": "off",
+      "present": false
+    },
+    "SQLITE_SECURE_DELETE": {
+      "requested": "on",
+      "present": true
+    },
+    "status": "ok"
+  },
+  "tests": {
+    "exit_code": 0,
+    "seconds": 0,
+    "errors": 0,
+    "tests": 95,
+    "failed_test_names": [],
+    "omitted_lines": 0,
+    "status": "completed",
+    "note": "'tests' and 'errors' come from the harness summary line; skip semantics are not yet extracted"
+  },
+  "coverage": {
+    "status": "ok",
+    "tool": "gcovr 8.3",
+    "file": "sqlite3.c",
+    "line_percent": 18.1,
+    "lines_covered": 10618,
+    "lines_total": 58665,
+    "function_percent": 28.8,
+    "functions_covered": 920,
+    "functions_total": 3191
+  },
+  "finished": "2026-11-16T19:57:28",
+  "result": "done"
+}

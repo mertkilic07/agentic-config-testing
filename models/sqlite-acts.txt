@@ -1,0 +1,8 @@
+[System]
+Name: SQLite_3_46_1_Pilot
+
+[Parameter]
+SQLITE_ENABLE_FTS5 (enum): off, on
+SQLITE_ENABLE_RTREE (enum): off, on
+SQLITE_ENABLE_COLUMN_METADATA (enum): off, on
+SQLITE_SECURE_DELETE (enum): off, on

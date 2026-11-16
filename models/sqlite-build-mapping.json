@@ -1,0 +1,11 @@
+{
+  "system": "SQLite",
+  "version": "3.46.1",
+  "note": "All four macros are tested with #ifdef/#ifndef in SQLite 3.46.1 (src/, ext/rtree, ext/fts5). 'on' defines the macro, 'off' leaves it undefined. Defining a macro as =0 would still count as defined, so it is never used for 'off'.",
+  "options": {
+    "SQLITE_ENABLE_FTS5":            {"on": ["-DSQLITE_ENABLE_FTS5"],            "off": [], "compile_option": "ENABLE_FTS5"},
+    "SQLITE_ENABLE_RTREE":           {"on": ["-DSQLITE_ENABLE_RTREE"],           "off": [], "compile_option": "ENABLE_RTREE"},
+    "SQLITE_ENABLE_COLUMN_METADATA": {"on": ["-DSQLITE_ENABLE_COLUMN_METADATA"], "off": [], "compile_option": "ENABLE_COLUMN_METADATA"},
+    "SQLITE_SECURE_DELETE":          {"on": ["-DSQLITE_SECURE_DELETE"],          "off": [], "compile_option": "SECURE_DELETE"}
+  }
+}
