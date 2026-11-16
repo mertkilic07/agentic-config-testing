@@ -57,7 +57,7 @@ Problems found and how they were handled:
 | `attach.test` aborted: "Tests do not work when run as root" | The test checks that a file is no longer writable after `chmod 0000`. On the Mac bind mount the file stays writable, also for a non-root user | Tests run in a fresh directory on the container's own filesystem (`/tmp`, later `~/ens491-work`) |
 | `backcompat.test` tried to execute `testfixture-test_config.gcno` | It runs every `testfixture?*` file next to the executable; coverage files on the bind mount looked executable | `testfixture` is copied into a separate directory before running |
 | gcovr 7.0 failed with `UnknownLineType` | gcovr version | gcovr 8.3 in a virtual environment |
-| gcovr 8.3 failed on the quick run with negative and very large counters | Not established. `testfixture` uses threads, and default gcov counters are not thread-safe | The runner now builds with `-fprofile-update=atomic`; whether this fixes it is being checked |
+| gcovr 8.3 failed on the quick run with negative and very large counters | Non-atomic counters with threads (negatives); genuinely huge loop counts (suspicious) | `-fprofile-update=atomic` (fixed negatives) + raised suspicious-hits threshold |
 
 The 4 quick-suite errors (`recoverfault-1/2-oom-*`, in `ext/recover/recoverfault.test`)
 are deliberate allocation-failure tests. Their cause is **not established**; they are recorded
@@ -95,12 +95,20 @@ First result (Linux x86_64 VM, not a team laptop):
 | Configuration | Values | Scope | Options check | Tests | Errors | Line coverage | Function coverage |
 |---|---|---|---|---|---|---|---|
 | acts-03 | FTS5=on, RTREE=off, COLUMN_METADATA=off, SECURE_DELETE=on | `main.test` | 4/4 as requested | 95 | 0 | 18.1% (10,618 / 58,665) | 28.8% |
+| acts-03 | same | `quick.test` (38 min) | 4/4 as requested | 755,539 | 9 | 96.1% (56,399 / 58,665) | 97.4% |
 
 Note: the number of lines in `sqlite3.c` depends on the configuration (58,665 here vs
 48,917 in the baseline), so coverage percentages must always be read together with the
 line counts.
 
-The quick-suite run of the same row is in progress.
+Quick-suite errors of acts-03: 4 × `recoverfault` (same as baseline), `zipfile-6.0`
+(timestamps differ by exactly 3600 s, likely time zone, not verified), and
+`fts5corrupt3-74.1/75.1` (expect an FTS3/4 `matchinfo` error message; this row has FTS5 but
+not FTS3/4 — possible missing `ifcapable` guard, **not verified**).
+
+Coverage fix: with `-fprofile-update=atomic` there are no more negative counters. gcovr still
+rejected some genuine counts (~9.9 × 10⁹ hits) as "suspicious", so the runner now passes
+`--gcov-suspicious-hits-threshold 1e11` and records it in `summary.json`.
 
 ## 6. Option screening: two silent constraints
 
@@ -124,7 +132,6 @@ Linux x86_64 VM.
 ## 7. What is not done yet
 
 - Quick-suite results for all covering-array rows, and the final table.
-- Reliable quick-suite coverage.
 - Passed/skipped counts (the harness only prints "N errors out of M tests").
 - Constraints in the model.
 - Test-gap analysis and AI-generated tests (the agentic part of the project).

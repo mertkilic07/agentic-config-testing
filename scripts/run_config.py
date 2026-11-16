@@ -21,6 +21,7 @@ recorded, never hidden, and later stages are skipped.
 import argparse, csv, datetime, json, os, platform, re, shutil, subprocess, sys, time
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SUSPICIOUS_HITS_THRESHOLD = 10**11
 
 
 def sh(cmd, cwd, log, env=None, timeout=None):
@@ -151,13 +152,17 @@ def run_one(a, mapping, header, row, n):
     # 5. coverage of sqlite3.c only (same boundary for every configuration)
     cov = os.path.join(res, "coverage"); os.makedirs(cov)
     gcda = os.path.join(build, "testfixture-sqlite3.gcda")
+    # SQLite's quick suite really executes some loops ~1e10 times; gcovr's default
+    # "suspicious hits" limit (2^32) would reject these genuine counts.
     r = subprocess.run(["gcovr", "--root", build, "--filter", re.escape(build) + r"/sqlite3\.c$",
+                        "--gcov-suspicious-hits-threshold", str(SUSPICIOUS_HITS_THRESHOLD),
                         "--json-summary", os.path.join(cov, "summary.json"), "--print-summary", gcda],
                        capture_output=True, text=True)
     open(os.path.join(cov, "gcovr.log"), "w").write(r.stdout + r.stderr)
     if r.returncode == 0 and os.path.exists(os.path.join(cov, "summary.json")):
         s = json.load(open(os.path.join(cov, "summary.json")))
         summary["coverage"] = {"status": "ok", "tool": "gcovr 8.3", "file": "sqlite3.c",
+                               "suspicious_hits_threshold": SUSPICIOUS_HITS_THRESHOLD,
                                "line_percent": s.get("line_percent"),
                                "lines_covered": s.get("line_covered"), "lines_total": s.get("line_total"),
                                "function_percent": s.get("function_percent"),
