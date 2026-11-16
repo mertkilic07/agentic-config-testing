@@ -144,9 +144,3 @@ not committed (see `.gitignore`).
 - **Architecture:** the image is built for the host's architecture (ARM64 on Apple Silicon,
   AMD64 on most Windows PCs). Results from different architectures should not be mixed in one
   comparison.
-
-## Reference
-
-Another group in this project studies curl:
-https://github.com/ebrarguclu/ENS-491-agentic-config-testing. We use their work as a
-methodological reference; their results are not ours.
