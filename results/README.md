@@ -1,6 +1,8 @@
 # results/
 
-One folder per run: `results/acts/acts-<row>-<scope>/`
+One folder per run: `results/acts/acts-<row>-<scope>/` (ACTS rows) and `results/acts/default-<scope>/` (all options off).
+The complete table is [coverage_table.md](coverage_table.md); `screening/` holds the option screening and
+`investigations/` holds checks of individual failures (not part of the table).
 
 | File | Committed | Contents |
 |---|---|---|

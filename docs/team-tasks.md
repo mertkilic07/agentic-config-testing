@@ -24,9 +24,9 @@ Swap tasks among yourselves if needed, but update this table.
 | A. Test-build the Dockerfile and run the smoke test | Tuna | – |
 | B. Run all covering-array rows with the quick suite and make the results table | ~~Tuna~~ Mert: **done for the pilot model** (16 Nov). Tuna re-runs it after C | A, C |
 | C. Grow the model, add constraints, generate the new ACTS covering array | Tuna | – |
-| D. Write `docs/selection.md`: why SQLite, and why **not** BusyBox and ZooKeeper | Emre | – |
-| E. Map existing tests to options (`ifcapable`) | Emre | – |
-| F. Investigate the 4 baseline `recoverfault` failures | Emre | A (or Mert's container) |
+| D. Write `docs/selection.md`: why SQLite, and why **not** BusyBox and ZooKeeper | Emre: **done** (PR #4) | – |
+| E. Map existing tests to options (`ifcapable`) | Emre: **done** (PR #2) | – |
+| F. Investigate the 4 baseline `recoverfault` failures | Emre: **done** (PR #3) | A (or Mert's container) |
 
 Mert: review pull requests, prepare the Wednesday summary, help where someone is blocked.
 
