@@ -21,8 +21,10 @@ This page explains the pipeline behind `scripts/run_config.py` and the known ope
 
 - **Baseline failures:** a team member's quick-suite run on the default build reported
   4 errors out of 591,311 tests (`recoverfault-*` allocation-failure tests in
-  `ext/recover/recoverfault.test`). Their cause is not established yet; they are not claimed
-  to be configuration-interaction bugs.
+  `ext/recover/recoverfault.test`). Cause found (task F): `recovercorrupt4.test` leaves a
+  corrupt `testdir/test.db2` that `recoverfault.test` reuses; a test-order dependency, not a
+  configuration interaction. Expected in every row; keep them in the error counts with a note.
+  See [results/investigations/recoverfault](../results/investigations/recoverfault/README.md).
 - **Quick-suite coverage:** an earlier attempt failed in gcovr with negative and suspiciously
   large counters. The runner now builds with `-fprofile-update=atomic` (thread-safe coverage
   counters, `testfixture` uses threads). Whether this fully fixes the problem is being checked.
