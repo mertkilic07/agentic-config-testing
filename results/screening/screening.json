@@ -1,0 +1,209 @@
+[
+  {
+    "name": "SQLITE_ENABLE_FTS5",
+    "flags": [
+      "-DSQLITE_ENABLE_FTS5"
+    ],
+    "build": "ok",
+    "compile_option_reported": true,
+    "probe_output": "1",
+    "main_test": "0 errors / 95 tests",
+    "seconds": 17
+  },
+  {
+    "name": "SQLITE_ENABLE_RTREE",
+    "flags": [
+      "-DSQLITE_ENABLE_RTREE"
+    ],
+    "build": "ok",
+    "compile_option_reported": true,
+    "probe_output": "1",
+    "main_test": "0 errors / 95 tests",
+    "seconds": 17
+  },
+  {
+    "name": "SQLITE_ENABLE_COLUMN_METADATA",
+    "flags": [
+      "-DSQLITE_ENABLE_COLUMN_METADATA"
+    ],
+    "build": "ok",
+    "compile_option_reported": true,
+    "probe_output": "1",
+    "main_test": "0 errors / 95 tests",
+    "seconds": 17
+  },
+  {
+    "name": "SQLITE_SECURE_DELETE",
+    "flags": [
+      "-DSQLITE_SECURE_DELETE"
+    ],
+    "build": "ok",
+    "compile_option_reported": true,
+    "probe_output": "1",
+    "main_test": "0 errors / 95 tests",
+    "seconds": 19
+  },
+  {
+    "name": "SQLITE_ENABLE_FTS3",
+    "flags": [
+      "-DSQLITE_ENABLE_FTS3"
+    ],
+    "build": "ok",
+    "compile_option_reported": true,
+    "probe_output": "1",
+    "main_test": "0 errors / 95 tests",
+    "seconds": 18
+  },
+  {
+    "name": "SQLITE_ENABLE_FTS4",
+    "flags": [
+      "-DSQLITE_ENABLE_FTS4"
+    ],
+    "build": "ok",
+    "compile_option_reported": true,
+    "probe_output": "1",
+    "main_test": "0 errors / 95 tests",
+    "seconds": 20
+  },
+  {
+    "name": "SQLITE_ENABLE_GEOPOLY",
+    "flags": [
+      "-DSQLITE_ENABLE_GEOPOLY"
+    ],
+    "build": "ok",
+    "compile_option_reported": true,
+    "probe_output": "ERROR: no such function: geopoly_area",
+    "main_test": "0 errors / 95 tests",
+    "seconds": 19
+  },
+  {
+    "name": "SQLITE_ENABLE_STAT4",
+    "flags": [
+      "-DSQLITE_ENABLE_STAT4=1"
+    ],
+    "build": "ok",
+    "compile_option_reported": true,
+    "probe_output": "1",
+    "main_test": "0 errors / 95 tests",
+    "seconds": 19
+  },
+  {
+    "name": "SQLITE_ENABLE_DBSTAT_VTAB",
+    "flags": [
+      "-DSQLITE_ENABLE_DBSTAT_VTAB"
+    ],
+    "build": "ok",
+    "compile_option_reported": true,
+    "probe_output": "1",
+    "main_test": "0 errors / 95 tests",
+    "seconds": 18
+  },
+  {
+    "name": "SQLITE_ENABLE_UPDATE_DELETE_LIMIT",
+    "flags": [
+      "-DSQLITE_ENABLE_UPDATE_DELETE_LIMIT"
+    ],
+    "build": "ok",
+    "compile_option_reported": true,
+    "probe_output": "1",
+    "main_test": "0 errors / 95 tests",
+    "seconds": 19
+  },
+  {
+    "name": "SQLITE_DEFAULT_FOREIGN_KEYS",
+    "flags": [
+      "-DSQLITE_DEFAULT_FOREIGN_KEYS=1"
+    ],
+    "build": "ok",
+    "compile_option_reported": true,
+    "probe_output": "1",
+    "main_test": "0 errors / 95 tests",
+    "seconds": 18
+  },
+  {
+    "name": "SQLITE_LIKE_DOESNT_MATCH_BLOBS",
+    "flags": [
+      "-DSQLITE_LIKE_DOESNT_MATCH_BLOBS"
+    ],
+    "build": "ok",
+    "compile_option_reported": true,
+    "probe_output": "1",
+    "main_test": "0 errors / 95 tests",
+    "seconds": 19
+  },
+  {
+    "name": "SQLITE_OMIT_WAL",
+    "flags": [
+      "-DSQLITE_OMIT_WAL"
+    ],
+    "build": "ok",
+    "compile_option_reported": true,
+    "probe_output": "1",
+    "main_test": "0 errors / 95 tests",
+    "seconds": 18
+  },
+  {
+    "name": "SQLITE_OMIT_AUTOVACUUM",
+    "flags": [
+      "-DSQLITE_OMIT_AUTOVACUUM"
+    ],
+    "build": "ok",
+    "compile_option_reported": true,
+    "probe_output": "1",
+    "main_test": "0 errors / 95 tests",
+    "seconds": 19
+  },
+  {
+    "name": "SQLITE_ENABLE_NULL_TRIM",
+    "flags": [
+      "-DSQLITE_ENABLE_NULL_TRIM"
+    ],
+    "build": "ok",
+    "compile_option_reported": true,
+    "probe_output": "1",
+    "main_test": "0 errors / 95 tests",
+    "seconds": 19
+  },
+  {
+    "name": "SQLITE_ENABLE_SORTER_REFERENCES",
+    "flags": [
+      "-DSQLITE_ENABLE_SORTER_REFERENCES"
+    ],
+    "build": "ok",
+    "compile_option_reported": true,
+    "probe_output": "1",
+    "main_test": "0 errors / 95 tests",
+    "seconds": 18
+  },
+  {
+    "name": "GEOPOLY without RTREE",
+    "flags": [
+      "-DSQLITE_ENABLE_GEOPOLY"
+    ],
+    "build": "ok",
+    "probe_output": "ERROR: no such function: geopoly_area",
+    "main_test": "0 errors / 95 tests",
+    "seconds": 19
+  },
+  {
+    "name": "GEOPOLY with RTREE",
+    "flags": [
+      "-DSQLITE_ENABLE_GEOPOLY",
+      "-DSQLITE_ENABLE_RTREE"
+    ],
+    "build": "ok",
+    "probe_output": "1",
+    "main_test": "0 errors / 95 tests",
+    "seconds": 18
+  },
+  {
+    "name": "OMIT_WAL, then PRAGMA journal_mode=WAL",
+    "flags": [
+      "-DSQLITE_OMIT_WAL"
+    ],
+    "build": "ok",
+    "probe_output": "delete",
+    "main_test": "0 errors / 95 tests",
+    "seconds": 18
+  }
+]

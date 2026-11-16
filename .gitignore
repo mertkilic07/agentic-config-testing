@@ -218,3 +218,20 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# ---- project-specific ----
+# Downloaded sources and tools (the Dockerfile downloads them)
+systems/
+tools/
+*.jar
+*.zip
+# Builds and per-run working directories
+builds/
+# Coverage counters and raw per-run logs (kept locally, too large for git)
+*.gcda
+*.gcno
+results/**/tests.log
+results/**/build.log
+results/**/coverage/*.html
+# macOS
+.DS_Store

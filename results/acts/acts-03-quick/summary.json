@@ -1,0 +1,80 @@
+{
+  "configuration": "acts-03",
+  "acts_row": 3,
+  "values": {
+    "SQLITE_ENABLE_FTS5": "on",
+    "SQLITE_ENABLE_RTREE": "off",
+    "SQLITE_ENABLE_COLUMN_METADATA": "off",
+    "SQLITE_SECURE_DELETE": "on"
+  },
+  "scope": "test/quick.test",
+  "sqlite_source": "/home/tester/s346",
+  "started": "2026-11-16T19:58:23",
+  "machine": "Linux x86_64",
+  "user": "tester",
+  "build": {
+    "opts": "-DSQLITE_ENABLE_FTS5 -DSQLITE_SECURE_DELETE",
+    "cflags": "-O0 -g --coverage -fprofile-update=atomic",
+    "exit_code": 0,
+    "seconds": 22,
+    "status": "ok"
+  },
+  "effective_options": {
+    "SQLITE_ENABLE_FTS5": {
+      "requested": "on",
+      "present": true
+    },
+    "SQLITE_ENABLE_RTREE": {
+      "requested": "off",
+      "present": false
+    },
+    "SQLITE_ENABLE_COLUMN_METADATA": {
+      "requested": "off",
+      "present": false
+    },
+    "SQLITE_SECURE_DELETE": {
+      "requested": "on",
+      "present": true
+    },
+    "status": "ok"
+  },
+  "tests": {
+    "exit_code": 1,
+    "seconds": 2259,
+    "errors": 9,
+    "tests": 755539,
+    "failed_test_names": [
+      "fts5corrupt3-74.1",
+      "fts5corrupt3-75.1",
+      "recoverfault-1-oom-persistent.524",
+      "recoverfault-1-oom-transient.524",
+      "recoverfault-2-oom-persistent.525",
+      "recoverfault-2-oom-transient.525",
+      "zipfile-6.0"
+    ],
+    "omitted_lines": 0,
+    "status": "completed",
+    "note": "'tests' and 'errors' come from the harness summary line; skip semantics are not yet extracted",
+    "failure_notes": {
+      "fts5corrupt3-74.1, -75.1": "expected 'unable to use function matchinfo in the requested context', got 'no such function: matchinfo'. matchinfo is an FTS3/FTS4 function; this row has FTS5=on without FTS3/FTS4. Possible missing ifcapable guard in the test; not yet verified.",
+      "recoverfault-*": "same 4 allocation-failure tests that fail in the default build (baseline failure).",
+      "zipfile-6.0": "expected and got timestamps differ by exactly 3600 s; likely time-zone/environment related; not verified."
+    }
+  },
+  "coverage": {
+    "status": "ok",
+    "tool": "gcovr 8.3",
+    "file": "sqlite3.c",
+    "suspicious_hits_threshold": 100000000000,
+    "line_percent": 96.1,
+    "lines_covered": 56399,
+    "lines_total": 58665,
+    "function_percent": 97.4,
+    "functions_covered": 3108,
+    "functions_total": 3191,
+    "note": "First gcovr attempt with the default threshold failed with SuspiciousHits (max count 9,933,819,199 on sqlite3.c:34636). No NegativeHits after building with -fprofile-update=atomic. Recomputed from the same .gcda files with --gcov-suspicious-hits-threshold 1e11."
+  },
+  "finished": "2026-11-16T20:36:27",
+  "result": "done",
+  "machine_note": "Linux x86_64 cloud VM (2 cores), run as non-root user 'tester'."
+}
