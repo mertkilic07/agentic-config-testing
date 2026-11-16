@@ -1,25 +1,58 @@
-# Generated test (LLM): pair SQLITE_ENABLE_FTS5 x SQLITE_ENABLE_FTS3 (outside the pilot model).
-# Motivation: fts5corrupt3-74.1/75.1 fail when FTS5 is on and FTS3 is off
-# (tests/existing/fts5corrupt3-matchinfo.md). This test states the behaviour of matchinfo()
-# on an FTS5 table for both settings of FTS3, with correct guards.
+#=============================================================================
+# gen_fts5_fts3.test
+#
+# Option pair : SQLITE_ENABLE_FTS5  x  SQLITE_ENABLE_FTS3
+#               (FTS3 is not in the pilot model; it is off in every row)
+# Written by  : LLM (Claude), November 2026 - see README.md in this folder
+#
+# WHY THIS TEST EXISTS
+#   SQLite's own tests fts5corrupt3-74.1/75.1 fail in every configuration
+#   with FTS5 on and FTS3 off (results/coverage_table.md). They are guarded
+#   only on FTS5, but their expected error message exists only when FTS3 is
+#   also compiled in (tests/existing/fts5corrupt3-matchinfo.md).
+#   This file shows the correctly guarded version of that check.
+#
+# BACKGROUND
+#   matchinfo() is a function of FTS3/FTS4, not of FTS5. When FTS3 is
+#   compiled in, it registers a placeholder "matchinfo" on every database
+#   connection; calling it in the wrong place gives
+#   "unable to use function matchinfo in the requested context".
+#   Without FTS3 the function does not exist at all.
+#
+# WHEN EACH PART RUNS
+#   Whole file : only if FTS5 is compiled in
+#   Test 1.1   : one version for builds with FTS3, one for builds without
+#=============================================================================
+
 source [file join [file dirname [info script]] common.tcl]
 set testprefix gen_fts5_fts3
+
 ifcapable !fts5 { finish_test ; return }
 
 do_execsql_test 1.0 {
   CREATE VIRTUAL TABLE t1 USING fts5(a);
   INSERT INTO t1 VALUES('e1 e2');
 }
+
+#-----------------------------------------------------------------------------
+# 1.1 Calling FTS3's matchinfo() on an FTS5 table is always rejected,
+#     but the error message depends on whether FTS3 is compiled in.
+#-----------------------------------------------------------------------------
 ifcapable fts3 {
-  # FTS3 overloads matchinfo() on every connection: calling it on an FTS5 table fails
-  # with the placeholder message.
-  do_catchsql_test 1.1 { SELECT matchinfo(t1) FROM t1 WHERE t1 MATCH 'e1' } \
-    {1 {unable to use function matchinfo in the requested context}}
+  do_catchsql_test 1.1 {
+    SELECT matchinfo(t1) FROM t1 WHERE t1 MATCH 'e1'
+  } {1 {unable to use function matchinfo in the requested context}}
 }
 ifcapable !fts3 {
-  do_catchsql_test 1.1 { SELECT matchinfo(t1) FROM t1 WHERE t1 MATCH 'e1' } \
-    {1 {no such function: matchinfo}}
+  do_catchsql_test 1.1 {
+    SELECT matchinfo(t1) FROM t1 WHERE t1 MATCH 'e1'
+  } {1 {no such function: matchinfo}}
 }
-# Either way the query is rejected; FTS5's own auxiliary functions still work.
+
+#-----------------------------------------------------------------------------
+# 1.2 FTS5's own ranking function bm25() works in both cases
+#     (bm25 scores are negative: smaller = better match).
+#-----------------------------------------------------------------------------
 do_execsql_test 1.2 { SELECT bm25(t1) < 0 FROM t1 WHERE t1 MATCH 'e1' } 1
+
 finish_test

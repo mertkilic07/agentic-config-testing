@@ -1,21 +1,52 @@
-# Generated test (LLM): pair SQLITE_ENABLE_COLUMN_METADATA x SQLITE_SECURE_DELETE.
-# Gap: no existing quick-suite file guards on both. No shared code path is expected:
-# the test checks that column origins are unaffected by secure_delete (independence check).
+#=============================================================================
+# gen_colmeta_secdel.test
+#
+# Option pair : SQLITE_ENABLE_COLUMN_METADATA  x  SQLITE_SECURE_DELETE
+# Written by  : LLM (Claude), November 2026 - see README.md in this folder
+#
+# WHY THIS TEST EXISTS
+#   No existing quick-suite test file is guarded on both "columnmetadata"
+#   and "secure_delete" (tests/existing/ifcapable-map.md).
+#
+# WHAT WE EXPECT
+#   These two options share no code that we know of. This is an
+#   INDEPENDENCE CHECK: after rows are deleted with secure_delete off or on,
+#   the column origin information of a query must be unchanged.
+#
+# NOTE ON A CORRECTED TEST (validation round 1)
+#   Tests 1.0 / 2.0 first expected no output, but "PRAGMA secure_delete = N"
+#   returns N. The expectation was corrected.
+#
+# WHEN IT RUNS
+#   Every build with COLUMN_METADATA. Both secure_delete values are tested
+#   at runtime (1.x = off, 2.x = on), so the compile-time SECURE_DELETE
+#   option only changes the starting default.
+#=============================================================================
+
 source [file join [file dirname [info script]] common.tcl]
 set testprefix gen_colmeta_secdel
+
 ifcapable !columnmetadata { finish_test ; return }
 
 foreach {tn sd} {1 0 2 1} {
   reset_db
+
+  # A normal table and a WITHOUT ROWID table (stored differently on disk).
   do_execsql_test $tn.0 "
     PRAGMA secure_delete = $sd;
     CREATE TABLE t1(a INTEGER PRIMARY KEY, b TEXT);
     CREATE TABLE t2(x PRIMARY KEY, y) WITHOUT ROWID;
   " $sd
+
+  # Insert and delete rows in both tables.
   do_execsql_test $tn.1 {
-    INSERT INTO t1 VALUES(1, 'a'), (2, 'b'); DELETE FROM t1 WHERE a=1;
-    INSERT INTO t2 VALUES(1, 'p'); DELETE FROM t2;
+    INSERT INTO t1 VALUES(1, 'a'), (2, 'b');
+    DELETE FROM t1 WHERE a=1;
+    INSERT INTO t2 VALUES(1, 'p');
+    DELETE FROM t2;
   }
+
+  # Each result column still reports the table it comes from.
   do_test $tn.2 {
     set stmt [sqlite3_prepare_v2 db {SELECT b, a, y FROM t1, t2} -1 dummy]
     set r [list]
@@ -24,4 +55,5 @@ foreach {tn sd} {1 0 2 1} {
     set r
   } {t1 t1 t2}
 }
+
 finish_test

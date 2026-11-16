@@ -1,42 +1,79 @@
-# Generated test (LLM): pair SQLITE_ENABLE_FTS5 x SQLITE_ENABLE_COLUMN_METADATA.
-# Gap: no existing quick-suite file guards on both fts5 and columnmetadata.
-# Oracle: documentation of sqlite3_column_table_name()/origin_name() ("If the Nth column
-# returned by the statement is an expression ... these routines return NULL") and of
-# sqlite3_table_column_metadata(). Expected values for virtual-table columns that the
-# documentation does not fix are marked CHARACTERIZATION (observed behaviour).
+#=============================================================================
+# gen_fts5_colmeta.test
+#
+# Option pair : SQLITE_ENABLE_FTS5  x  SQLITE_ENABLE_COLUMN_METADATA
+# Written by  : LLM (Claude), November 2026 - see README.md in this folder
+#
+# WHY THIS TEST EXISTS
+#   No existing quick-suite test file is guarded on both "fts5" and
+#   "columnmetadata" (tests/existing/ifcapable-map.md).
+#
+# WHAT THE OPTIONS DO
+#   FTS5             full-text search tables
+#   COLUMN_METADATA  adds functions that tell, for each column of a query
+#                    result, which table and column it comes from
+#                    (sqlite3_column_table_name / _origin_name).
+#
+# EXPECTED BEHAVIOUR
+#   From the documentation: a result column that is a real table column has
+#   that table/column as origin; a result column that is an expression
+#   (e.g. a function call) has no origin (empty).
+#   Values the documentation does not fix for virtual tables are marked
+#   CHARACTERIZATION: they record the observed behaviour, so that a change
+#   is noticed.
+#
+# WHEN EACH PART RUNS
+#   Whole file : only if FTS5 is compiled in
+#   Section 1  : only if COLUMN_METADATA is also compiled in
+#   Section 2  : every FTS5 build (sqlite3_table_column_metadata() always
+#                exists)
+#=============================================================================
+
 source [file join [file dirname [info script]] common.tcl]
 set testprefix gen_fts5_colmeta
-ifcapable !fts5 { finish_test ; return }
 
-proc origins {sql} {
-  set stmt [sqlite3_prepare_v2 db $sql -1 dummy]
-  set res [list]
-  for {set i 0} {$i < [sqlite3_column_count $stmt]} {incr i} {
-    lappend res [sqlite3_column_table_name $stmt $i] [sqlite3_column_origin_name $stmt $i]
-  }
-  sqlite3_finalize $stmt
-  set res
-}
+ifcapable !fts5 { finish_test ; return }
 
 do_execsql_test 1.0 {
   CREATE VIRTUAL TABLE ft USING fts5(a, b);
   INSERT INTO ft VALUES('hello world', 'second column');
 }
 
+#-----------------------------------------------------------------------------
+# 1. Where do the result columns of queries on an FTS5 table come from?
+#    gen_origins returns {table column table column ...}.
+#-----------------------------------------------------------------------------
 ifcapable columnmetadata {
-  # Columns of an FTS5 table have their table as origin.
-  do_test 1.1 { origins {SELECT a, b FROM ft} } {ft a ft b}
-  # Auxiliary-function results are expressions: no origin.
-  do_test 1.2 { origins {SELECT highlight(ft, 0, '[', ']') FROM ft WHERE ft MATCH 'hello'} } {{} {}}
-  # Hidden columns rank and the table-name column. CHARACTERIZATION.
-  do_test 1.3 { origins {SELECT rank, ft FROM ft WHERE ft MATCH 'hello'} } {ft rank ft ft}
-  # Shadow tables are ordinary tables.
-  do_test 1.4 { origins {SELECT id, block FROM ft_data} } {ft_data id ft_data block}
+  # Normal FTS5 columns: origin is the FTS5 table itself.
+  do_test 1.1 { gen_origins {SELECT a, b FROM ft} } {ft a ft b}
+
+  # highlight() is a function call, i.e. an expression: no origin.
+  do_test 1.2 {
+    gen_origins {SELECT highlight(ft, 0, '[', ']') FROM ft WHERE ft MATCH 'hello'}
+  } {{} {}}
+
+  # Hidden columns "rank" and "ft" (same name as the table).
+  # CHARACTERIZATION: they are reported like normal columns.
+  do_test 1.3 {
+    gen_origins {SELECT rank, ft FROM ft WHERE ft MATCH 'hello'}
+  } {ft rank ft ft}
+
+  # ft_data is one of the ordinary "shadow" tables in which FTS5 stores
+  # its index; it behaves like any table.
+  do_test 1.4 { gen_origins {SELECT id, block FROM ft_data} } {ft_data id ft_data block}
 }
 
-# sqlite3_table_column_metadata is always available.
+#-----------------------------------------------------------------------------
+# 2. sqlite3_table_column_metadata(): declared type, collation, NOT NULL,
+#    primary key, autoincrement of one column.
+#-----------------------------------------------------------------------------
+# FTS5 columns have no declared type.
 do_test 2.1 { sqlite3_table_column_metadata db main ft a } {{} BINARY 0 0 0}
+
+# The shadow table's id column is an INTEGER PRIMARY KEY.
 do_test 2.2 { sqlite3_table_column_metadata db main ft_data id } {INTEGER BINARY 0 1 0}
+
+# Asking for a column that does not exist is an error.
 do_test 2.3 { catch {sqlite3_table_column_metadata db main ft nosuchcol} } 1
 
 finish_test

@@ -1,33 +1,64 @@
-# Generated test (LLM): pair SQLITE_ENABLE_RTREE x SQLITE_ENABLE_COLUMN_METADATA.
-# Gap: no existing quick-suite file guards on both rtree and columnmetadata.
-# Oracle as in gen_fts5_colmeta.test; CHARACTERIZATION marks observed behaviour.
+#=============================================================================
+# gen_rtree_colmeta.test
+#
+# Option pair : SQLITE_ENABLE_RTREE  x  SQLITE_ENABLE_COLUMN_METADATA
+# Written by  : LLM (Claude), November 2026 - see README.md in this folder
+#
+# WHY THIS TEST EXISTS
+#   No existing quick-suite test file is guarded on both "rtree" and
+#   "columnmetadata" (tests/existing/ifcapable-map.md).
+#
+# WHAT THE OPTIONS DO
+#   RTREE            spatial index tables. Besides the coordinates, an
+#                    R-tree can have "auxiliary" columns (written "+name")
+#                    for extra data such as a label.
+#   COLUMN_METADATA  tells which table/column each query result column
+#                    comes from.
+#
+# NOTE ON A CORRECTED TEST (validation round 1)
+#   Test 2.1 first expected the declared type TEXT for "+label TEXT".
+#   The real result is empty: the R-tree module declares auxiliary columns
+#   by name only and drops the type (ext/rtree/rtree.c:3664). The LLM's
+#   assumption was wrong; the expectation was corrected.
+#
+# WHEN EACH PART RUNS
+#   Whole file : only if RTREE is compiled in
+#   Section 1  : only if COLUMN_METADATA is also compiled in
+#   Section 2  : every RTREE build
+#=============================================================================
+
 source [file join [file dirname [info script]] common.tcl]
 set testprefix gen_rtree_colmeta
-ifcapable !rtree { finish_test ; return }
 
-proc origins {sql} {
-  set stmt [sqlite3_prepare_v2 db $sql -1 dummy]
-  set res [list]
-  for {set i 0} {$i < [sqlite3_column_count $stmt]} {incr i} {
-    lappend res [sqlite3_column_table_name $stmt $i] [sqlite3_column_origin_name $stmt $i]
-  }
-  sqlite3_finalize $stmt
-  set res
-}
+ifcapable !rtree { finish_test ; return }
 
 do_execsql_test 1.0 {
   CREATE VIRTUAL TABLE rt USING rtree(id, x0, x1, +label TEXT);
   INSERT INTO rt VALUES(1, 0, 10, 'first');
 }
+
+#-----------------------------------------------------------------------------
+# 1. Where do the result columns of queries on an R-tree come from?
+#-----------------------------------------------------------------------------
 ifcapable columnmetadata {
-  do_test 1.1 { origins {SELECT id, x0, label FROM rt} } {rt id rt x0 rt label}
-  do_test 1.2 { origins {SELECT x1-x0 FROM rt} } {{} {}}
-  do_test 1.3 { origins {SELECT nodeno, data FROM rt_node} } {rt_node nodeno rt_node data}
+  # id, coordinate and auxiliary columns all come from the R-tree table.
+  do_test 1.1 { gen_origins {SELECT id, x0, label FROM rt} } {rt id rt x0 rt label}
+
+  # A calculation is an expression: no origin.
+  do_test 1.2 { gen_origins {SELECT x1-x0 FROM rt} } {{} {}}
+
+  # rt_node is the ordinary shadow table that stores the tree's nodes.
+  do_test 1.3 { gen_origins {SELECT nodeno, data FROM rt_node} } {rt_node nodeno rt_node data}
 }
-# Declared types of R-tree columns. The R-tree module declares auxiliary columns by name
-# only, so a type written after "+label" is dropped (ext/rtree/rtree.c:3664). Revised after
-# the first validation run, which expected TEXT.
+
+#-----------------------------------------------------------------------------
+# 2. Declared column information (sqlite3_table_column_metadata).
+#    Result list: {type collation notnull primarykey autoincrement}
+#-----------------------------------------------------------------------------
+# The auxiliary column has no declared type (see note above).
 do_test 2.1 { lindex [sqlite3_table_column_metadata db main rt label] 0 } {}
+
+# nodeno is the primary key of the shadow table rt_node.
 do_test 2.2 { lindex [sqlite3_table_column_metadata db main rt_node nodeno] 3 } {1}
 
 finish_test

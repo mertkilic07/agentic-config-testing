@@ -48,17 +48,29 @@ A guard on both keywords is only a proxy: a file may exercise a pair without gua
 | 1 | `gen_rtree_secdel-1.3` fails on acts-06 (RTREE on, SECURE_DELETE on) | **finding**, see section 5 | kept failing on purpose; runtime-pragma variant 1.4/1.5 added |
 | 2 | only `gen_rtree_secdel-1.3/1.5` fail, on exactly the configurations where they run | expected | – |
 
-Round 2 result (errors / test cases; a file that is skipped reports 1 test):
+Round 2 result per file and configuration:
 
-| Config | colmeta_secdel | fts5_colmeta | fts5_fts3 | fts5_secdel | rtree_colmeta | rtree_secdel |
+- ✅ **passed** – the file ran and all its checks passed (number = test cases run)
+- ➖ **skipped** – the option the file tests is not compiled into this configuration
+- 🔴 **finding** – a check failed on purpose: deleted R-tree data was found in the file (section 5)
+
+| Config (options on) | colmeta_secdel | fts5_colmeta | fts5_fts3 | fts5_secdel | rtree_colmeta | rtree_secdel |
 |---|---|---|---|---|---|---|
-| default | skip | skip | skip | skip | skip | skip |
-| acts-01 (COLMETA, SECDEL) | 0 / 7 | skip | skip | skip | skip | skip |
-| acts-02 (RTREE) | skip | skip | skip | skip | 0 / 4 | **1** / 12 |
-| acts-03 (FTS5, SECDEL) | skip | 0 / 5 | 0 / 4 | 0 / 12 | skip | skip |
-| acts-04 (FTS5, RTREE, COLMETA) | 0 / 7 | 0 / 9 | 0 / 4 | 0 / 11 | 0 / 7 | **1** / 12 |
-| acts-05 (FTS5, COLMETA) | 0 / 7 | 0 / 9 | 0 / 4 | 0 / 11 | skip | skip |
-| acts-06 (RTREE, COLMETA, SECDEL) | 0 / 7 | skip | skip | skip | 0 / 7 | **2** / 13 |
+| default (none) | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ |
+| acts-01 (COLMETA, SECDEL) | ✅ 7 | ➖ | ➖ | ➖ | ➖ | ➖ |
+| acts-02 (RTREE) | ➖ | ➖ | ➖ | ➖ | ✅ 4 | 🔴 1 of 12 |
+| acts-03 (FTS5, SECDEL) | ➖ | ✅ 5 | ✅ 4 | ✅ 12 | ➖ | ➖ |
+| acts-04 (FTS5, RTREE, COLMETA) | ✅ 7 | ✅ 9 | ✅ 4 | ✅ 11 | ✅ 7 | 🔴 1 of 12 |
+| acts-05 (FTS5, COLMETA) | ✅ 7 | ✅ 9 | ✅ 4 | ✅ 11 | ➖ | ➖ |
+| acts-06 (RTREE, COLMETA, SECDEL) | ✅ 7 | ➖ | ➖ | ➖ | ✅ 7 | 🔴 2 of 13 |
+
+Why the numbers differ: a file also skips the *parts* whose second option is off. Example:
+`fts5_colmeta` runs 5 checks in acts-03 (no COLUMN_METADATA) and 9 in acts-04 (with it).
+`rtree_secdel` fails once (runtime `secure_delete`, test 1.5) in every RTREE build, and a
+second time (compile-time option, test 1.3) only in acts-06.
+
+Re-validated after the files were rewritten with explanatory comments (17 Nov 2026):
+identical results.
 
 `gen_colmeta_secdel` runs whenever COLUMN_METADATA is on (it tests both secure_delete values
 at runtime). Control check (acts-04 build): with `secure_delete=0` the deleted FTS5 term and

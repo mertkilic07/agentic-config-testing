@@ -1,18 +1,46 @@
-# Generated test (LLM): pair SQLITE_ENABLE_FTS5 x SQLITE_SECURE_DELETE.
-# Gap: no existing quick-suite file guards on both fts5 and secure_delete.
-# Oracle: SQLite documentation of PRAGMA secure_delete ("the default setting is determined
-# by the SQLITE_SECURE_DELETE compile-time option"; "SQLite overwrites deleted content with
-# zeros") and of the FTS5 'optimize' and 'secure-delete' commands.
+#=============================================================================
+# gen_fts5_secdel.test
+#
+# Option pair : SQLITE_ENABLE_FTS5  x  SQLITE_SECURE_DELETE
+# Written by  : LLM (Claude), November 2026 - see README.md in this folder
+#
+# WHY THIS TEST EXISTS
+#   No existing quick-suite test file is guarded on both "fts5" and
+#   "secure_delete" (tests/existing/ifcapable-map.md). So nobody checks
+#   whether full-text search data is really erased when secure delete is on.
+#
+# WHAT THE OPTIONS DO
+#   FTS5           full-text search tables (CREATE VIRTUAL TABLE ... fts5)
+#   SECURE_DELETE  makes "PRAGMA secure_delete" ON by default. Then SQLite
+#                  overwrites deleted content with zeros, so deleted data
+#                  cannot be recovered from the database file.
+#
+# EXPECTED BEHAVIOUR (from the SQLite documentation)
+#   After a document is deleted from an FTS5 table and the index is
+#   optimized, its words must not be found in the file while secure_delete
+#   is on.
+#
+# WHEN EACH PART RUNS
+#   Section 1-4 : only if FTS5 is compiled in (otherwise the file is skipped)
+#   Section 2.3 : only if SECURE_DELETE is also compiled in
+#=============================================================================
+
 source [file join [file dirname [info script]] common.tcl]
 set testprefix gen_fts5_secdel
+
 ifcapable !fts5 { finish_test ; return }
 
-# 1. The compile-time option sets the default of PRAGMA secure_delete.
+#-----------------------------------------------------------------------------
+# 1. The compile-time option decides the default of PRAGMA secure_delete.
+#-----------------------------------------------------------------------------
 ifcapable secure_delete  { do_execsql_test 1.0 { PRAGMA secure_delete } 1 }
 ifcapable !secure_delete { do_execsql_test 1.0 { PRAGMA secure_delete } 0 }
 
-# 2. A deleted FTS5 document and its index entries must not remain in the database file
-#    when secure_delete is in effect (default from the compile-time option).
+#-----------------------------------------------------------------------------
+# 2. Delete one document containing a unique word ("zqxjkvmarker") from an
+#    FTS5 table with 300 other documents, then optimize the index.
+#    With the compile-time option on, the word must be gone from the file.
+#-----------------------------------------------------------------------------
 reset_db
 do_execsql_test 2.0 {
   PRAGMA journal_mode = DELETE;
@@ -21,18 +49,31 @@ do_execsql_test 2.0 {
     INSERT INTO ft SELECT 'filler document number ' || i FROM s;
   INSERT INTO ft VALUES('alpha zqxjkvmarker beta');
 } {delete}
+
+# The document is deleted and no longer found by a search.
 do_execsql_test 2.1 {
   DELETE FROM ft WHERE ft MATCH 'zqxjkvmarker';
   INSERT INTO ft(ft) VALUES('optimize');
   SELECT count(*) FROM ft WHERE ft MATCH 'zqxjkvmarker';
 } {0}
-do_execsql_test 2.2 { INSERT INTO ft(ft) VALUES('integrity-check'); PRAGMA integrity_check } {ok}
+
+# Both the FTS5 index and the database file are consistent.
+do_execsql_test 2.2 {
+  INSERT INTO ft(ft) VALUES('integrity-check');
+  PRAGMA integrity_check;
+} {ok}
+
+# The deleted word is not physically present in the file any more.
 ifcapable secure_delete {
   do_test 2.3 { db close ; gen_file_contains test.db zqxjkvmarker } 0
   sqlite3 db test.db
 }
 
-# 3. Runtime PRAGMA secure_delete=ON must give the same guarantee as the compile-time option.
+#-----------------------------------------------------------------------------
+# 3. Same as section 2, but secure_delete is switched on at runtime.
+#    This must give the same guarantee as the compile-time option, and it
+#    runs in every FTS5 build.
+#-----------------------------------------------------------------------------
 reset_db
 do_execsql_test 3.0 {
   PRAGMA journal_mode = DELETE;
@@ -44,11 +85,17 @@ do_execsql_test 3.0 {
   DELETE FROM ft WHERE ft MATCH 'qwmarkerpz';
   INSERT INTO ft(ft) VALUES('optimize');
 } {delete 1}
+
 do_test 3.1 { db close ; gen_file_contains test.db qwmarkerpz } 0
 sqlite3 db test.db
 
-# 4. FTS5's own 'secure-delete' option removes index entries immediately (no optimize),
-#    independently of the page-level PRAGMA secure_delete.
+#-----------------------------------------------------------------------------
+# 4. FTS5 has its own option with a similar name: 'secure-delete'.
+#    It removes a deleted document's words from the index at once (no
+#    optimize needed). It must work the same whether the page-level
+#    PRAGMA secure_delete is off (4.1) or on (4.2).
+#    fts5vocab lists the words that are currently in the index.
+#-----------------------------------------------------------------------------
 foreach {tn sd} {1 0 2 1} {
   reset_db
   do_execsql_test 4.$tn.0 "
@@ -60,6 +107,8 @@ foreach {tn sd} {1 0 2 1} {
     DELETE FROM ft WHERE rowid=1;
     SELECT term FROM v ORDER BY term;
   " [list $sd four three two]
+  # "one" existed only in the deleted document, so it must be gone.
+
   do_execsql_test 4.$tn.1 { INSERT INTO ft(ft) VALUES('integrity-check') } {}
 }
 

@@ -1,15 +1,51 @@
-# Generated test (LLM): pair SQLITE_ENABLE_RTREE x SQLITE_SECURE_DELETE.
-# Gap: no existing quick-suite file guards on both rtree and secure_delete.
-# Oracle: documentation of PRAGMA secure_delete and of rtreecheck().
+#=============================================================================
+# gen_rtree_secdel.test
+#
+# Option pair : SQLITE_ENABLE_RTREE  x  SQLITE_SECURE_DELETE
+# Written by  : LLM (Claude), November 2026 - see README.md in this folder
+#
+# WHY THIS TEST EXISTS
+#   No existing quick-suite test file is guarded on both "rtree" and
+#   "secure_delete" (tests/existing/ifcapable-map.md).
+#
+# WHAT THE OPTIONS DO
+#   RTREE          spatial index tables (rectangles / bounding boxes),
+#                  CREATE VIRTUAL TABLE ... USING rtree
+#   SECURE_DELETE  PRAGMA secure_delete is ON by default: deleted content is
+#                  overwritten with zeros.
+#
+# EXPECTED BEHAVIOUR (from the SQLite documentation)
+#   A deleted R-tree entry must not remain in the database file while
+#   secure_delete is on.
+#
+# RESULT: TESTS 1.3 AND 1.5 FAIL ON PURPOSE - THIS IS THE FINDING
+#   The deleted entry stays inside the R-tree's node data. Cause:
+#   nodeDeleteCell() (ext/rtree/rtree.c:834) moves the remaining cells with
+#   memmove() and lowers the cell count, but never clears the slot that
+#   becomes unused. Those bytes are part of a *live* row of the shadow table
+#   rt_node, so secure_delete (which only zeros *deleted* content) does not
+#   touch them. Whether SQLite considers this a bug: not verified.
+#
+# WHEN EACH PART RUNS
+#   Whole file  : only if RTREE is compiled in
+#   Test 1.3    : only if SECURE_DELETE is also compiled in (row acts-06)
+#   Tests 1.4-5 : every RTREE build (secure_delete switched on at runtime)
+#=============================================================================
+
 source [file join [file dirname [info script]] common.tcl]
 set testprefix gen_rtree_secdel
+
 ifcapable !rtree { finish_test ; return }
 
-# A distinctive 64-bit rowid; R-tree nodes store it as 8 big-endian bytes.
-set MARK 6510615555426900570  ;# 0x5A5A5A5A5A5A5A5A
+# The entry we delete gets a very recognisable id: 0x5A5A5A5A5A5A5A5A.
+# R-tree nodes store ids as 8 big-endian bytes, so NEEDLE is exactly the
+# byte pattern we search for in the file.
+set MARK   6510615555426900570
 set NEEDLE [binary format W $MARK]
 
-# 1. Deleting an R-tree entry with secure_delete in effect leaves no copy of it in the file.
+#-----------------------------------------------------------------------------
+# 1. Insert 500 rectangles plus the marked one, then delete the marked one.
+#-----------------------------------------------------------------------------
 do_execsql_test 1.0 "
   PRAGMA journal_mode = DELETE;
   CREATE VIRTUAL TABLE rt USING rtree(id, x0, x1, y0, y1);
@@ -17,18 +53,23 @@ do_execsql_test 1.0 "
     INSERT INTO rt SELECT i, i, i+1, i, i+1 FROM s;
   INSERT INTO rt VALUES($MARK, 10.0, 20.0, 10.0, 20.0);
 " {delete}
+
+# The row is gone from the table.
 do_execsql_test 1.1 "DELETE FROM rt WHERE id=$MARK; SELECT count(*) FROM rt" {500}
+
+# The R-tree structure and the database file are consistent.
 do_execsql_test 1.2 { SELECT rtreecheck('rt'); PRAGMA integrity_check } {ok ok}
+
+# Compile-time secure_delete: the marked id must not be in the file.
+# >>> FAILS (finding): the id is still there. <<<
 ifcapable secure_delete {
   do_test 1.3 { db close ; gen_file_contains test.db $NEEDLE } 0
   sqlite3 db test.db
 }
 
-# 1b. The same with the runtime pragma, so the check also runs on builds without the
-#     compile-time option. FINDING (validation run, 17 Nov 2026): this fails. nodeDeleteCell()
-#     (ext/rtree/rtree.c:834) shifts the following cells with memmove() and decrements the
-#     cell count, but never clears the now-unused last slot of the node. The deleted entry is
-#     still inside the live node blob, so page-level secure_delete cannot zero it.
+# Same check with secure_delete switched on at runtime, so it also runs in
+# RTREE builds without the compile-time option.
+# >>> 1.5 FAILS (finding) in every RTREE build. <<<
 reset_db
 do_execsql_test 1.4 "
   PRAGMA journal_mode = DELETE;
@@ -39,11 +80,18 @@ do_execsql_test 1.4 "
   INSERT INTO rt VALUES($MARK, 10.0, 20.0, 10.0, 20.0);
   DELETE FROM rt WHERE id=$MARK;
 " {delete 1}
+
 do_test 1.5 { db close ; gen_file_contains test.db $NEEDLE } 0
 sqlite3 db test.db
 
-# 2. Large deletes force node merges (CondenseTree); the tree must stay consistent and
-#    queries correct with secure_delete on or off.
+#-----------------------------------------------------------------------------
+# 2. Delete two thirds of 2000 rectangles. This forces the R-tree to merge
+#    and rebuild nodes. With secure_delete off (2.1) and on (2.2):
+#      .0  the right rows remain (666 rows, ids are the multiples of 3)
+#      .1  the tree is still consistent
+#      .2  a spatial query gives the same answer as a full scan
+#          ("+0" stops SQLite from using the R-tree index)
+#-----------------------------------------------------------------------------
 foreach {tn sd} {1 0 2 1} {
   reset_db
   do_execsql_test 2.$tn.0 "
@@ -54,10 +102,14 @@ foreach {tn sd} {1 0 2 1} {
     DELETE FROM rt WHERE id%3 != 0;
     SELECT count(*), sum(id) FROM rt;
   " [list $sd 666 666333]
+
   do_execsql_test 2.$tn.1 { SELECT rtreecheck('rt') } ok
+
   do_execsql_test 2.$tn.2 {
     SELECT count(*) FROM rt WHERE x0>=10 AND x1<=20 AND y0>=10 AND y1<=20
-  } [db one {SELECT count(*) FROM rt WHERE x0+0>=10 AND x1+0<=20 AND y0+0>=10 AND y1+0<=20}]
+  } [db one {
+    SELECT count(*) FROM rt WHERE x0+0>=10 AND x1+0<=20 AND y0+0>=10 AND y1+0<=20
+  }]
 }
 
 finish_test
