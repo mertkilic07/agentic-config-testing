@@ -1,0 +1,32 @@
+{
+  "system": "SQLite (https://github.com/sqlite/sqlite)",
+  "option_type": "runtime (PRAGMA statements, applied per connection / per database file)",
+  "generated_by": "LLM (Claude), from the SQLite PRAGMA documentation (https://sqlite.org/pragma.html); to be validated by the team",
+  "options": [
+    {"name": "journal_mode", "values": ["DELETE", "TRUNCATE", "PERSIST", "MEMORY", "WAL", "OFF"], "default": "DELETE",
+     "note": "How the rollback journal is kept. OFF disables atomic commit/rollback."},
+    {"name": "synchronous", "values": ["OFF", "NORMAL", "FULL"], "default": "FULL",
+     "note": "How often SQLite waits for data to reach disk."},
+    {"name": "locking_mode", "values": ["NORMAL", "EXCLUSIVE"], "default": "NORMAL",
+     "note": "EXCLUSIVE keeps the file lock after the first access, so other connections are blocked."},
+    {"name": "page_size", "values": ["1024", "4096", "65536"], "default": "4096",
+     "note": "Must be set before the database is first written; cannot be changed once in WAL mode."},
+    {"name": "cache_size", "values": ["-2000", "10"], "default": "-2000",
+     "note": "Negative = KiB, positive = number of pages."},
+    {"name": "auto_vacuum", "values": ["NONE", "FULL", "INCREMENTAL"], "default": "NONE",
+     "note": "Must be set before the first table is created. FULL returns free pages to the OS at every commit."},
+    {"name": "temp_store", "values": ["DEFAULT", "MEMORY"], "default": "DEFAULT",
+     "note": "Where temporary tables and indices are kept."},
+    {"name": "foreign_keys", "values": ["OFF", "ON"], "default": "OFF",
+     "note": "Foreign key constraints are enforced only when ON."},
+    {"name": "secure_delete", "values": ["OFF", "ON"], "default": "OFF",
+     "note": "ON overwrites deleted content with zeros."}
+  ],
+  "constraints_and_dependencies": [
+    {"id": "C1", "kind": "ordering", "text": "page_size and auto_vacuum must be applied before any table is created (and page_size before switching to WAL); the apply script therefore sets them first on a fresh database file."},
+    {"id": "C2", "kind": "semantic", "text": "With journal_mode=OFF, ROLLBACK is not guaranteed to restore the previous state; a rollback check is not a valid oracle for this setting."},
+    {"id": "C3", "kind": "semantic", "text": "With locking_mode=EXCLUSIVE, a second connection cannot access the database while the first connection is open."},
+    {"id": "C4", "kind": "semantic", "text": "auto_vacuum=FULL leaves no free pages after a commit that deletes data; NONE keeps them on the freelist; INCREMENTAL keeps them until PRAGMA incremental_vacuum."},
+    {"id": "C5", "kind": "semantic", "text": "foreign_keys=ON rejects an insert that references a missing parent row; OFF accepts it."}
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "note": "Candidate compile-time options for growing the model. Each one is screened alone (scripts/screen_options.py) before it may enter the ACTS model. 'probe' is Tcl run in testfixture; it must print 1 when the feature really works.",
+  "candidates": {
+    "SQLITE_ENABLE_FTS5":            {"on": ["-DSQLITE_ENABLE_FTS5"], "compile_option": "ENABLE_FTS5",
+                                      "probe": "db eval {CREATE VIRTUAL TABLE t USING fts5(x)}; puts 1"},
+    "SQLITE_ENABLE_RTREE":           {"on": ["-DSQLITE_ENABLE_RTREE"], "compile_option": "ENABLE_RTREE",
+                                      "probe": "db eval {CREATE VIRTUAL TABLE t USING rtree(id,a,b)}; puts 1"},
+    "SQLITE_ENABLE_COLUMN_METADATA": {"on": ["-DSQLITE_ENABLE_COLUMN_METADATA"], "compile_option": "ENABLE_COLUMN_METADATA",
+                                      "probe": "puts 1"},
+    "SQLITE_SECURE_DELETE":          {"on": ["-DSQLITE_SECURE_DELETE"], "compile_option": "SECURE_DELETE",
+                                      "probe": "puts [db one {PRAGMA secure_delete}]"},
+    "SQLITE_ENABLE_FTS3":            {"on": ["-DSQLITE_ENABLE_FTS3"], "compile_option": "ENABLE_FTS3",
+                                      "probe": "db eval {CREATE VIRTUAL TABLE t USING fts3(x)}; puts 1"},
+    "SQLITE_ENABLE_FTS4":            {"on": ["-DSQLITE_ENABLE_FTS4"], "compile_option": "ENABLE_FTS4",
+                                      "probe": "db eval {CREATE VIRTUAL TABLE t USING fts4(x)}; puts 1"},
+    "SQLITE_ENABLE_GEOPOLY":         {"on": ["-DSQLITE_ENABLE_GEOPOLY"], "compile_option": "ENABLE_GEOPOLY",
+                                      "probe": "puts [expr {[db one {SELECT geopoly_area('[[0,0],[1,0],[1,1],[0,0]]')}] > 0}]"},
+    "SQLITE_ENABLE_STAT4":           {"on": ["-DSQLITE_ENABLE_STAT4=1"], "compile_option": "ENABLE_STAT4",
+                                      "probe": "db eval {CREATE TABLE a(x); CREATE INDEX ai ON a(x); INSERT INTO a VALUES(1); ANALYZE}; puts [db one {SELECT count(*) FROM sqlite_master WHERE name='sqlite_stat4'}]"},
+    "SQLITE_ENABLE_DBSTAT_VTAB":     {"on": ["-DSQLITE_ENABLE_DBSTAT_VTAB"], "compile_option": "ENABLE_DBSTAT_VTAB",
+                                      "probe": "db eval {CREATE TABLE a(x)}; db eval {SELECT * FROM dbstat}; puts 1"},
+    "SQLITE_ENABLE_UPDATE_DELETE_LIMIT": {"on": ["-DSQLITE_ENABLE_UPDATE_DELETE_LIMIT"], "compile_option": "ENABLE_UPDATE_DELETE_LIMIT",
+                                      "probe": "db eval {CREATE TABLE a(x); INSERT INTO a VALUES(1),(2); DELETE FROM a LIMIT 1}; puts [expr {[db one {SELECT count(*) FROM a}] == 1}]"},
+    "SQLITE_DEFAULT_FOREIGN_KEYS":   {"on": ["-DSQLITE_DEFAULT_FOREIGN_KEYS=1"], "compile_option": "DEFAULT_FOREIGN_KEYS",
+                                      "probe": "puts [db one {PRAGMA foreign_keys}]"},
+    "SQLITE_LIKE_DOESNT_MATCH_BLOBS": {"on": ["-DSQLITE_LIKE_DOESNT_MATCH_BLOBS"], "compile_option": "LIKE_DOESNT_MATCH_BLOBS",
+                                      "probe": "puts [expr {[db one {SELECT x'61' LIKE 'a'}] == 0}]"},
+    "SQLITE_OMIT_WAL":               {"on": ["-DSQLITE_OMIT_WAL"], "compile_option": "OMIT_WAL",
+                                      "probe": "puts 1"},
+    "SQLITE_OMIT_AUTOVACUUM":        {"on": ["-DSQLITE_OMIT_AUTOVACUUM"], "compile_option": "OMIT_AUTOVACUUM",
+                                      "probe": "puts 1"},
+    "SQLITE_ENABLE_NULL_TRIM":       {"on": ["-DSQLITE_ENABLE_NULL_TRIM"], "compile_option": "ENABLE_NULL_TRIM",
+                                      "probe": "puts 1"},
+    "SQLITE_ENABLE_SORTER_REFERENCES": {"on": ["-DSQLITE_ENABLE_SORTER_REFERENCES"], "compile_option": "ENABLE_SORTER_REFERENCES",
+                                      "probe": "puts 1"}
+  },
+  "pairs_to_check": [
+    {"name": "GEOPOLY without RTREE", "flags": ["-DSQLITE_ENABLE_GEOPOLY"], "why": "geopoly code is inside ext/rtree/rtree.c behind #ifdef SQLITE_ENABLE_GEOPOLY"},
+    {"name": "GEOPOLY with RTREE", "flags": ["-DSQLITE_ENABLE_GEOPOLY", "-DSQLITE_ENABLE_RTREE"]},
+    {"name": "OMIT_WAL, then PRAGMA journal_mode=WAL", "flags": ["-DSQLITE_OMIT_WAL"],
+     "probe": "set f /tmp/screen-wal-[pid].db; file delete -force $f; sqlite3 d2 $f; puts [d2 one {PRAGMA journal_mode=WAL}]; d2 close; file delete -force $f"}
+  ]
+}

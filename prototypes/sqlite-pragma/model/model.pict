@@ -1,0 +1,9 @@
+journal_mode: DELETE, TRUNCATE, PERSIST, MEMORY, WAL, OFF
+synchronous: OFF, NORMAL, FULL
+locking_mode: NORMAL, EXCLUSIVE
+page_size: 1024, 4096, 65536
+cache_size: -2000, 10
+auto_vacuum: NONE, FULL, INCREMENTAL
+temp_store: DEFAULT, MEMORY
+foreign_keys: OFF, ON
+secure_delete: OFF, ON
