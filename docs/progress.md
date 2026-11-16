@@ -110,6 +110,22 @@ Coverage fix: with `-fprofile-update=atomic` there are no more negative counters
 rejected some genuine counts (~9.9 × 10⁹ hits) as "suspicious", so the runner now passes
 `--gcov-suspicious-hits-threshold 1e11` and records it in `summary.json`.
 
+## 5b. Full results table (16 November 2026)
+
+All 6 covering-array rows and the default build were run with `test/quick.test` on one machine.
+Table and failure analysis: [results/coverage_table.md](../results/coverage_table.md).
+
+- Every build succeeded and every option was confirmed by `PRAGMA compile_options`.
+- 590,935 – 761,095 tests per configuration; line coverage of `sqlite3.c` 95.6 – 96.2%,
+  function coverage 96.9 – 97.5%.
+- The default build and the FTS5=off rows have 5 errors (4 `recoverfault`, `zipfile-6.0`).
+- The three FTS5=on rows have 4 extra errors (`fts5corrupt3-74.1/75.1`, `values-11.0/11.1`).
+  Both tests are guarded by `ifcapable fts5` but use FTS3 features. This is a
+  configuration-dependent defect **in the test suite** (FTS5 on, FTS3 off), verified for
+  `values.test` in the source.
+- Runner fix: failed test names are now read from the harness line "Failures on these tests";
+  the earlier pattern missed tests that fail with an error message.
+
 ## 6. Option screening: two silent constraints
 
 Before an option may enter the model, it is built alone and checked
@@ -131,7 +147,6 @@ Linux x86_64 VM.
 
 ## 7. What is not done yet
 
-- Quick-suite results for all covering-array rows, and the final table.
 - Passed/skipped counts (the harness only prints "N errors out of M tests").
 - Constraints in the model.
 - Test-gap analysis and AI-generated tests (the agentic part of the project).

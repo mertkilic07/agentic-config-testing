@@ -22,7 +22,7 @@ Swap tasks among yourselves if needed, but update this table.
 | Task | Owner | Depends on |
 |---|---|---|
 | A. Test-build the Dockerfile and run the smoke test | Tuna | – |
-| B. Run all covering-array rows with the quick suite and make the results table | Tuna | A, C |
+| B. Run all covering-array rows with the quick suite and make the results table | ~~Tuna~~ Mert: **done for the pilot model** (16 Nov). Tuna re-runs it after C | A, C |
 | C. Grow the model, add constraints, generate the new ACTS covering array | Tuna | – |
 | D. Write `docs/selection.md`: why SQLite, and why **not** BusyBox and ZooKeeper | Emre | – |
 | E. Map existing tests to options (`ifcapable`) | Emre | – |

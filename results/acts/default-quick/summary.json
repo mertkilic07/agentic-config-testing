@@ -1,0 +1,76 @@
+{
+  "configuration": "default",
+  "acts_row": 0,
+  "values": {
+    "SQLITE_ENABLE_FTS5": "off",
+    "SQLITE_ENABLE_RTREE": "off",
+    "SQLITE_ENABLE_COLUMN_METADATA": "off",
+    "SQLITE_SECURE_DELETE": "off"
+  },
+  "scope": "test/quick.test",
+  "sqlite_source": "/home/tester/s346",
+  "started": "2026-11-16T23:10:56",
+  "machine": "Linux x86_64",
+  "user": "tester",
+  "build": {
+    "opts": "",
+    "cflags": "-O0 -g --coverage -fprofile-update=atomic",
+    "exit_code": 0,
+    "seconds": 18,
+    "status": "ok"
+  },
+  "effective_options": {
+    "SQLITE_ENABLE_FTS5": {
+      "requested": "off",
+      "present": false
+    },
+    "SQLITE_ENABLE_RTREE": {
+      "requested": "off",
+      "present": false
+    },
+    "SQLITE_ENABLE_COLUMN_METADATA": {
+      "requested": "off",
+      "present": false
+    },
+    "SQLITE_SECURE_DELETE": {
+      "requested": "off",
+      "present": false
+    },
+    "status": "ok"
+  },
+  "tests": {
+    "exit_code": 1,
+    "seconds": 1361,
+    "errors": 5,
+    "tests": 590935,
+    "failed_test_names": [
+      "recoverfault-1-oom-persistent.435",
+      "recoverfault-1-oom-transient.435",
+      "recoverfault-2-oom-persistent.436",
+      "recoverfault-2-oom-transient.436",
+      "zipfile-6.0"
+    ],
+    "omitted_lines": 0,
+    "status": "completed",
+    "note": "'tests' and 'errors' come from the harness summary line; skip semantics are not yet extracted",
+    "failure_notes": {
+      "recoverfault": "recoverfault-1/2-oom-*: 4 allocation-failure tests; fail in every configuration including the default build (baseline failure, cause not established).",
+      "zipfile-6.0": "zipfile-6.0: expected and got timestamps differ by exactly 3600 s; fails in every configuration; likely time-zone related, not verified."
+    }
+  },
+  "coverage": {
+    "status": "ok",
+    "tool": "gcovr 8.3",
+    "file": "sqlite3.c",
+    "suspicious_hits_threshold": 100000000000,
+    "line_percent": 95.6,
+    "lines_covered": 46792,
+    "lines_total": 48926,
+    "function_percent": 96.9,
+    "functions_covered": 2524,
+    "functions_total": 2604
+  },
+  "finished": "2026-11-16T23:33:57",
+  "result": "done",
+  "machine_note": "Linux x86_64 cloud VM (2 cores), run as non-root user 'tester'."
+}

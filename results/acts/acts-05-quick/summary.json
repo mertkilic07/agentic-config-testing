@@ -1,0 +1,82 @@
+{
+  "configuration": "acts-05",
+  "acts_row": 5,
+  "values": {
+    "SQLITE_ENABLE_FTS5": "on",
+    "SQLITE_ENABLE_RTREE": "off",
+    "SQLITE_ENABLE_COLUMN_METADATA": "on",
+    "SQLITE_SECURE_DELETE": "off"
+  },
+  "scope": "test/quick.test",
+  "sqlite_source": "/home/tester/s346",
+  "started": "2026-11-16T22:09:47",
+  "machine": "Linux x86_64",
+  "user": "tester",
+  "build": {
+    "opts": "-DSQLITE_ENABLE_FTS5 -DSQLITE_ENABLE_COLUMN_METADATA",
+    "cflags": "-O0 -g --coverage -fprofile-update=atomic",
+    "exit_code": 0,
+    "seconds": 22,
+    "status": "ok"
+  },
+  "effective_options": {
+    "SQLITE_ENABLE_FTS5": {
+      "requested": "on",
+      "present": true
+    },
+    "SQLITE_ENABLE_RTREE": {
+      "requested": "off",
+      "present": false
+    },
+    "SQLITE_ENABLE_COLUMN_METADATA": {
+      "requested": "on",
+      "present": true
+    },
+    "SQLITE_SECURE_DELETE": {
+      "requested": "off",
+      "present": false
+    },
+    "status": "ok"
+  },
+  "tests": {
+    "exit_code": 1,
+    "seconds": 2003,
+    "errors": 9,
+    "tests": 758790,
+    "failed_test_names": [
+      "fts5corrupt3-74.1",
+      "fts5corrupt3-75.1",
+      "recoverfault-1-oom-persistent.541",
+      "recoverfault-1-oom-transient.541",
+      "recoverfault-2-oom-persistent.542",
+      "recoverfault-2-oom-transient.542",
+      "values-11.0",
+      "values-11.1",
+      "zipfile-6.0"
+    ],
+    "omitted_lines": 0,
+    "status": "completed",
+    "note": "'tests' and 'errors' come from the harness summary line; skip semantics are not yet extracted",
+    "failure_notes": {
+      "fts5corrupt3": "fts5corrupt3-74.1/75.1: test guarded only by 'ifcapable fts5' but expects the FTS3/4 matchinfo() error message; with FTS5 on and FTS3 off it gets 'no such function: matchinfo'. Occurs exactly in the rows with FTS5=on.",
+      "values-11": "values-11.0/11.1: test/values.test line 383 is guarded by 'ifcapable fts5' but creates a table USING fts3; with FTS5 on and FTS3 off: 'no such module: fts3'. Verified in the test source.",
+      "recoverfault": "recoverfault-1/2-oom-*: 4 allocation-failure tests; fail in every configuration including the default build (baseline failure, cause not established).",
+      "zipfile-6.0": "zipfile-6.0: expected and got timestamps differ by exactly 3600 s; fails in every configuration; likely time-zone related, not verified."
+    }
+  },
+  "coverage": {
+    "status": "ok",
+    "tool": "gcovr 8.3",
+    "file": "sqlite3.c",
+    "suspicious_hits_threshold": 100000000000,
+    "line_percent": 96.1,
+    "lines_covered": 56426,
+    "lines_total": 58696,
+    "function_percent": 97.4,
+    "functions_covered": 3113,
+    "functions_total": 3197
+  },
+  "finished": "2026-11-16T22:43:36",
+  "result": "done",
+  "machine_note": "Linux x86_64 cloud VM (2 cores), run as non-root user 'tester'."
+}

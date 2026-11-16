@@ -143,7 +143,11 @@ def run_one(a, mapping, header, row, n):
     secs = round(time.time() - t)
     text = open(test_log, errors="replace").read()
     m = re.findall(r"(\d+) errors? out of (\d+) tests", text)
-    failed_names = sorted(set(re.findall(r"^! (\S+) expected", text, re.M)))
+    # The harness prints the complete list on one line; "! X expected" lines miss
+    # tests that fail with an error instead of a wrong result.
+    m_fail = re.search(r"^!Failures on these tests: (.*)$", text, re.M)
+    failed_names = sorted(set(m_fail.group(1).split() if m_fail
+                              else re.findall(r"^! (\S+) expected", text, re.M)))
     summary["tests"] = {
         "exit_code": rc, "seconds": secs,
         "errors": int(m[-1][0]) if m else None, "tests": int(m[-1][1]) if m else None,
