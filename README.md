@@ -63,6 +63,7 @@ python3 scripts/run_config.py --row 1 --scope main     # smoke test, about 1 min
 | Run all configurations | `python3 scripts/run_config.py --all --scope quick` |
 | Build the results table | `python3 scripts/make_table.py --scope quick > results/coverage_table.md` |
 | Screen new candidate options | `python3 scripts/screen_options.py` |
+| Map existing tests to options (`ifcapable`) | `python3 scripts/map_ifcapable.py --json tests/existing/ifcapable-map.json --md tests/existing/ifcapable-map.md` |
 
 `--scope` selects SQLite's test script: `main` (95 tests, seconds) or `quick` (about 590,000 test cases, 30–60 minutes).
 How each step works: [docs/method.md](docs/method.md).

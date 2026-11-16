@@ -107,7 +107,15 @@ line counts.
 Quick-suite errors of acts-03: 4 × `recoverfault` (same as baseline), `zipfile-6.0`
 (timestamps differ by exactly 3600 s, likely time zone, not verified), and
 `fts5corrupt3-74.1/75.1` (expect an FTS3/4 `matchinfo` error message; this row has FTS5 but
-not FTS3/4 — possible missing `ifcapable` guard, **not verified**).
+not FTS3/4).
+
+The `fts5corrupt3` cause is now **verified** (task E): the expected message exists only when
+FTS3 is compiled in (`ext/fts3/fts3.c:4174`), but the file is guarded only on FTS5. Running
+only that file on fast builds (no coverage, x86_64): FTS5 + SECURE_DELETE → these 2 errors
+(`no such function: matchinfo`); adding FTS3 → 0 errors. This is an FTS5 × FTS3 interaction
+in the test suite, not shown to be a library defect. Since FTS3 is off in every row, rows 3–5
+(FTS5 on) are expected to show it (not verified until the full table is in). Details:
+[tests/existing/fts5corrupt3-matchinfo.md](../tests/existing/fts5corrupt3-matchinfo.md).
 
 Coverage fix: with `-fprofile-update=atomic` there are no more negative counters. gcovr still
 rejected some genuine counts (~9.9 × 10⁹ hits) as "suspicious", so the runner now passes
