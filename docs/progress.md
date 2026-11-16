@@ -156,10 +156,29 @@ The second one crosses the compile-time / runtime boundary. Both are candidates 
 constraint list of the model and for the later test-gap analysis. These checks ran on a
 Linux x86_64 VM.
 
+## 6b. First AI-generated tests (16–17 November 2026)
+
+Gap: 5 of the 6 pilot option pairs are never guarded together in the quick suite (task E map).
+An LLM (Claude, in the working session) wrote 6 Tcl test files for them plus FTS5 × FTS3,
+validated them on all 7 configurations and measured before/after coverage. Details:
+[tests/generated/README.md](../tests/generated/README.md),
+[results/generated/coverage_ab.md](../results/generated/coverage_ab.md).
+
+- 2 of the generated tests were wrong in round 1 (one wrong expected output, one wrong
+  assumption about R-tree column types) and were corrected; recorded, not hidden.
+- **Finding:** deleting an R-tree entry with `secure_delete` on leaves the entry in the live
+  `rt_node` blob (`nodeDeleteCell()` does not clear the freed slot, `ext/rtree/rtree.c:834`).
+  With the compile-time option it shows only in acts-06, the covering-array row with
+  RTREE × SECURE_DELETE. Whether SQLite considers this a defect: not verified.
+- Coverage gain is small (0–7 lines per configuration) but lands on option-dependent branches,
+  e.g. the `secure_delete=OFF` page-free path that the quick suite never runs in a
+  SECURE_DELETE build.
+
 ## 7. What is not done yet
 
 - Passed/skipped counts (the harness only prints "N errors out of M tests").
 - Constraints in the model.
-- Test-gap analysis and AI-generated tests (the agentic part of the project).
+- An autonomous agent loop (the first iteration was run step by step in a session).
+- A larger model, so the gap analysis has more pairs.
 
 Who does what next: [team-tasks.md](team-tasks.md).

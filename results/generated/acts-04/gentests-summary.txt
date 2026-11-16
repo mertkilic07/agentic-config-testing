@@ -1,0 +1,7 @@
+0 errors out of 7 tests on vm Linux 64-bit little-endian
+0 errors out of 9 tests on vm Linux 64-bit little-endian
+0 errors out of 4 tests on vm Linux 64-bit little-endian
+0 errors out of 11 tests on vm Linux 64-bit little-endian
+0 errors out of 7 tests on vm Linux 64-bit little-endian
+1 errors out of 12 tests on vm Linux 64-bit little-endian
+!Failures on these tests: gen_rtree_secdel-1.5
