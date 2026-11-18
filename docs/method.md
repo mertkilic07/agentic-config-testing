@@ -25,11 +25,14 @@ This page explains the pipeline behind `scripts/run_config.py` and the known ope
   corrupt `testdir/test.db2` that `recoverfault.test` reuses; a test-order dependency, not a
   configuration interaction. Expected in every row; keep them in the error counts with a note.
   See [results/investigations/recoverfault](../results/investigations/recoverfault/README.md).
-- **Quick-suite coverage:** an earlier attempt failed in gcovr with negative and suspiciously
-  large counters. The runner now builds with `-fprofile-update=atomic` (thread-safe coverage
-  counters, `testfixture` uses threads). Whether this fully fixes the problem is being checked.
-- **Passed / skipped counts:** SQLite's harness prints "N errors out of M tests"; passed and
-  skipped counts are not extracted yet, so they are not reported.
+- **Quick-suite coverage (resolved):** an earlier attempt failed in gcovr with negative and
+  suspiciously large counters. The runner builds with `-fprofile-update=atomic` (thread-safe
+  coverage counters, `testfixture` uses threads) and passes
+  `--gcov-suspicious-hits-threshold 1e11`; coverage status is `ok` in all 7 quick runs.
+- **Passed / skipped counts:** SQLite's harness prints "N errors out of M tests". Passed is
+  derived as M − N − 1 (the harness adds one count when it finishes, `test/tester.tcl:1298`).
+  Skipped cannot be reported: `ifcapable` does not run the guarded code and nothing counts it.
+  See the note under [results/coverage_table.md](../results/coverage_table.md).
 - **Architecture:** the image is built for the host's architecture (ARM64 on Apple Silicon,
   AMD64 on most Windows PCs). Results from different architectures should not be mixed in one
   comparison.

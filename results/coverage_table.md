@@ -1,14 +1,14 @@
-| Configuration | Values | Scope | Build | Options check | Tests run | Errors | Line coverage | Lines covered / total | Function coverage |
-|---|---|---|---|---|---|---|---|---|---|
-| acts-01 | ENABLE_FTS5=off, ENABLE_RTREE=off, ENABLE_COLUMN_METADATA=on, SECURE_DELETE=on | test/quick.test | ok | ok | 615077 | 5 | 95.6% | 46,817 / 48,959 | 96.9% |
-| acts-02 | ENABLE_FTS5=off, ENABLE_RTREE=on, ENABLE_COLUMN_METADATA=off, SECURE_DELETE=off | test/quick.test | ok | ok | 593195 | 5 | 95.8% | 48,491 / 50,617 | 97.1% |
-| acts-03 | ENABLE_FTS5=on, ENABLE_RTREE=off, ENABLE_COLUMN_METADATA=off, SECURE_DELETE=on | test/quick.test | ok | ok | 755539 | 9 | 96.1% | 56,399 / 58,665 | 97.4% |
-| acts-04 | ENABLE_FTS5=on, ENABLE_RTREE=on, ENABLE_COLUMN_METADATA=on, SECURE_DELETE=off | test/quick.test | ok | ok | 761095 | 9 | 96.2% | 58,078 / 60,387 | 97.5% |
-| acts-05 | ENABLE_FTS5=on, ENABLE_RTREE=off, ENABLE_COLUMN_METADATA=on, SECURE_DELETE=off | test/quick.test | ok | ok | 758790 | 9 | 96.1% | 56,426 / 58,696 | 97.4% |
-| acts-06 | ENABLE_FTS5=off, ENABLE_RTREE=on, ENABLE_COLUMN_METADATA=on, SECURE_DELETE=on | test/quick.test | ok | ok | 617349 | 5 | 95.8% | 48,516 / 50,650 | 97.1% |
-| default | ENABLE_FTS5=off, ENABLE_RTREE=off, ENABLE_COLUMN_METADATA=off, SECURE_DELETE=off | test/quick.test | ok | ok | 590935 | 5 | 95.6% | 46,792 / 48,926 | 96.9% |
+| Configuration | Values | Scope | Build | Options check | Tests run | Passed | Failed | Skipped | Line coverage | Lines covered / total | Function coverage |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| acts-01 | ENABLE_FTS5=off, ENABLE_RTREE=off, ENABLE_COLUMN_METADATA=on, SECURE_DELETE=on | test/quick.test | ok | ok | 615,077 | 615,071 | 5 | n/a | 95.6% | 46,817 / 48,959 | 96.9% |
+| acts-02 | ENABLE_FTS5=off, ENABLE_RTREE=on, ENABLE_COLUMN_METADATA=off, SECURE_DELETE=off | test/quick.test | ok | ok | 593,195 | 593,189 | 5 | n/a | 95.8% | 48,491 / 50,617 | 97.1% |
+| acts-03 | ENABLE_FTS5=on, ENABLE_RTREE=off, ENABLE_COLUMN_METADATA=off, SECURE_DELETE=on | test/quick.test | ok | ok | 755,539 | 755,529 | 9 | n/a | 96.1% | 56,399 / 58,665 | 97.4% |
+| acts-04 | ENABLE_FTS5=on, ENABLE_RTREE=on, ENABLE_COLUMN_METADATA=on, SECURE_DELETE=off | test/quick.test | ok | ok | 761,095 | 761,085 | 9 | n/a | 96.2% | 58,078 / 60,387 | 97.5% |
+| acts-05 | ENABLE_FTS5=on, ENABLE_RTREE=off, ENABLE_COLUMN_METADATA=on, SECURE_DELETE=off | test/quick.test | ok | ok | 758,790 | 758,780 | 9 | n/a | 96.1% | 56,426 / 58,696 | 97.4% |
+| acts-06 | ENABLE_FTS5=off, ENABLE_RTREE=on, ENABLE_COLUMN_METADATA=on, SECURE_DELETE=on | test/quick.test | ok | ok | 617,349 | 617,343 | 5 | n/a | 95.8% | 48,516 / 50,650 | 97.1% |
+| default | ENABLE_FTS5=off, ENABLE_RTREE=off, ENABLE_COLUMN_METADATA=off, SECURE_DELETE=off | test/quick.test | ok | ok | 590,935 | 590,929 | 5 | n/a | 95.6% | 46,792 / 48,926 | 96.9% |
 
-'Tests run' and 'Errors' are taken from the summary line of SQLite's Tcl test harness. Passed/skipped counts are not yet extracted reliably, so they are not reported.
+'Tests run' and 'Failed' are the two numbers of the harness summary line "N errors out of M tests". **Passed** = Tests run - Failed - 1: the harness counts every executed test (`do_test` calls `incr_ntest`) plus one extra count when it finishes (`finalize_testing`, `test/tester.tcl:1298`), and every failure is one of the executed tests (`fail_test`). **Skipped** is not reported because SQLite's harness does not count it: `ifcapable` (`test/tester.tcl:1745`) simply does not run the guarded code, and the only "Omitted" list is for tests filtered out by name. The effect of skipping shows in 'Tests run', which changes with the configuration (about 591k without FTS5, up to 761k with it).
 
 ## Failed tests per configuration
 
