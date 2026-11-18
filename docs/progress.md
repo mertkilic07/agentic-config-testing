@@ -176,7 +176,9 @@ validated them on all 7 configurations and measured before/after coverage. Detai
 
 ## 7. What is not done yet
 
-- Passed/skipped counts (the harness only prints "N errors out of M tests").
+- A skipped-test count: SQLite's harness does not count skipped tests (`ifcapable` leaves the
+  code out), so the table reports Passed (derived) but not Skipped. A file-level estimate from
+  the `ifcapable` map would be possible, but it is not done.
 - Constraints in the model.
 - An autonomous agent loop (the first iteration was run step by step in a session).
 - A larger model, so the gap analysis has more pairs.

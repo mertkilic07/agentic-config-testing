@@ -65,17 +65,20 @@ We study **SQLite 3.46.1** and four of its compile-time options:
 SQLite's own `quick` test suite on all 6 covering-array configurations plus the default build
 (✓ = option on). Full table with failure causes: [results/coverage_table.md](results/coverage_table.md)
 
-| Config | FTS5 | RTREE | COL_META | SEC_DEL | Tests run | Errors | Line coverage | Function coverage |
-|---|:-:|:-:|:-:|:-:|--:|--:|--:|--:|
-| default | | | | | 590,935 | 5 | 95.6% | 96.9% |
-| acts-01 | | | ✓ | ✓ | 615,077 | 5 | 95.6% | 96.9% |
-| acts-02 | | ✓ | | | 593,195 | 5 | 95.8% | 97.1% |
-| acts-03 | ✓ | | | ✓ | 755,539 | **9** | 96.1% | 97.4% |
-| acts-04 | ✓ | ✓ | ✓ | | 761,095 | **9** | 96.2% | 97.5% |
-| acts-05 | ✓ | | ✓ | | 758,790 | **9** | 96.1% | 97.4% |
-| acts-06 | | ✓ | ✓ | ✓ | 617,349 | 5 | 95.8% | 97.1% |
+| Config | FTS5 | RTREE | COL_META | SEC_DEL | Tests run | Passed | Failed | Line coverage | Function coverage |
+|---|:-:|:-:|:-:|:-:|--:|--:|--:|--:|--:|
+| default | | | | | 590,935 | 590,929 | 5 | 95.6% | 96.9% |
+| acts-01 | | | ✓ | ✓ | 615,077 | 615,071 | 5 | 95.6% | 96.9% |
+| acts-02 | | ✓ | | | 593,195 | 593,189 | 5 | 95.8% | 97.1% |
+| acts-03 | ✓ | | | ✓ | 755,539 | 755,529 | **9** | 96.1% | 97.4% |
+| acts-04 | ✓ | ✓ | ✓ | | 761,095 | 761,085 | **9** | 96.2% | 97.5% |
+| acts-05 | ✓ | | ✓ | | 758,790 | 758,780 | **9** | 96.1% | 97.4% |
+| acts-06 | | ✓ | ✓ | ✓ | 617,349 | 617,343 | 5 | 95.8% | 97.1% |
 
 - Every build succeeded, and every option was confirmed to be really on or off.
+- **Skipped** is not a column because SQLite's harness does not count skipped tests (`ifcapable`
+  just leaves the code out). The effect is visible in *Tests run*. How Passed is computed:
+  [results table](results/coverage_table.md).
 - The options change **which tests run**: about 590k tests without FTS5, up to 761k with it.
 - 5 errors appear in **every** configuration, so they are not caused by the options
   (explained in [Findings](#4-findings), 4.4).
@@ -100,7 +103,7 @@ back with SQL from the R-tree's internal table.
 
 Cause: `nodeDeleteCell()` (`ext/rtree/rtree.c:834`) never clears the slot it frees. With the
 compile-time option, this shows up **only in acts-06**, the one configuration with both
-RTREE and SECURE_DELETE. No existing SQLite test covers this pair.
+RTREE and SECURE_DELETE. No existing quick-suite test file guards on both options together.
 Whether SQLite's developers regard it as a defect: *not verified*.
 → [details](tests/generated/README.md#5-finding-deleted-r-tree-entries-survive-secure_delete)
 
@@ -126,7 +129,7 @@ The remaining error (`zipfile-6.0`, a 1-hour timestamp difference) is probably a
 
 | Step | Result |
 |---|---|
-| **Find the gaps** | We mapped every SQLite test to the options it depends on ([`ifcapable` map](tests/existing/ifcapable-map.md)). **5 of the 6 option pairs** are never tested together. |
+| **Find the gaps** | We mapped every SQLite test to the options it depends on ([`ifcapable` map](tests/existing/ifcapable-map.md)). **5 of the 6 option pairs** are never guarded together in any test file (a proxy: a file can exercise a pair without guarding on it). |
 | **Write tests** | An LLM wrote 6 test files in SQLite's own test format, one per gap, plus FTS5 × FTS3. → [tests/generated](tests/generated/) |
 | **Validate** | Every file was run on all 7 configurations. 2 tests were wrong at first (the LLM's mistake) and were corrected; this is recorded, not hidden. |
 | **Find** | The R-tree / secure_delete behaviour (finding 4.2). |
